@@ -58,14 +58,13 @@
             <ul class="dropdown-menu">
                 <li class="side-down">
                     <a class="nav-arrow main-b" href="{% url 'user_registration' %}">
-                        <div style="display: flex;justify-content: space-between;">Join SPAI<img
-                                src="{% static 'image/triangle.svg' %}" alt=""></div>
+                        <div style="display: flex;justify-content: space-between;">Join SPAI</div>
                     </a>
-                    <ul class="dropdown-menu side">
-                        <li><a class="main-c" href="{% url 'membership' %}?page=previlege">About Membership
-                            Privilege</a></li>
-                    </ul>
+                    
                 </li>
+                <li><a class="main-b" href="{% url 'membership' %}?page=previlege">About Membership
+                    Privilege</a></li>
+               
                 <li><a class="main-b" href="{% url 'about_page' %}?page=committee">Executive Members</a></li>
                 <li><a class="main-b" href="{% url 'membership' %}?page=patrons">Patrons</a></li>
                 <li><a class="main-b" href="{% url 'life_members_get' %}">Life Members</a></li>

@@ -75,9 +75,9 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',  # MySQL backend
-        'NAME': 'spai_check',  # Database name
+        'NAME': 'spai',  # Database name
         'USER': 'root',  # Database user
-        'PASSWORD': 'root',  # Database password
+        'PASSWORD': '',  # Database password
         'HOST': 'localhost',  # Database host, use 'localhost' or the IP of your MySQL server
         'PORT': '3306',  # MySQL default port
     }

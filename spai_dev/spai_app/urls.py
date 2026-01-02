@@ -26,6 +26,7 @@ urlpatterns = [
     # latest URLs
     path('user/login', views.user_login_page, name='login_page'),
     path('user/registration/', views.user_registration, name='user_registration'),
+    path('renew/', views.renew, name="renew"),
     path('user/profile/details/', views.user_profile_details, name='user_profile_details'),
     path('members/', views.members, name="members"),
     path('logout/', views.user_logout, name='logout'),

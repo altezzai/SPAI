@@ -343,8 +343,8 @@
 
 .pre-content {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 10px;
 }
 @media (max-width: 720px){
     .pre-content{
@@ -353,10 +353,9 @@
 }
 .previl {
 
-    padding: 22px 36px 22px 36px;
+    padding:  5px 36px;
 
     border-radius: 8px;
-    background: #3B82F6;
 
 
 }

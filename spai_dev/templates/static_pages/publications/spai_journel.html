@@ -7,6 +7,33 @@
 <link rel="stylesheet" href="{% static 'css/sub/content2.css' %}">
 <link rel="stylesheet" href="{% static 'css/new/journel.css' %}">
 <link rel="stylesheet" href="{% static 'css/home/contactus.css' %}">
+<style>
+    .pub-items-con {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-gap: 20px;
+    margin: 30px ;
+}
+
+.pub-item {
+    background-color: #3e26a5;
+    padding: 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    height:100px;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pub-item span{
+    text-align: center;
+    color: white;
+    font-size: larger;
+}
+</style>
 {% endblock %}
 
 {% block header %}
@@ -40,6 +67,12 @@
     </div>
         
     
+</div>
+<div class="pub-items-con ">
+    <div class="pub-item"><span>IJSEP</span></div>
+    <div class="pub-item"> <span>BOOK SERIES</span></div>
+    <div class="pub-item"><span>POSITION PAPERS</span></div>
+    <div class="pub-item"><span>NEWS</span></div>
 </div>
 <div class="about-container run-repeat">
     <div class="about">

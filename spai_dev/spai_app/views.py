@@ -21,7 +21,7 @@ from rest_framework.views import APIView
 
 from . import models, forms
 from .models import GalleryManagement, User, EventManagement, UserDetailModel, GalleryImage, PaymentModel, Testimonials, \
-    AnnualSubscriptionModel, SubscriptionPayment, BannerEvents
+    AnnualSubscriptionModel, SubscriptionPayment, BannerEvents, RenewMembership
 from .decorators import admin_only, authenticated_only
 from .utils import render_to_pdf, get_registration_num, get_research_paper_no, send_mail_to_executives, \
     send_password_reset_email, update_subscription_status, send_contact_us_mail
@@ -303,6 +303,23 @@ def user_registration(request):
         context = {"form": form}
         return render(request, "members/user_registration.html", context)
 
+def renew(request):
+    if(request.user.is_authenticated==False):
+        return redirect('login_page')
+    
+    if request.method == 'POST':
+        fs = FileSystemStorage()
+        file = request.FILES['file']
+        file_name = fs.save(file.name, file)
+
+        RenewMembership.objects.create(
+            file=file_name,
+            user=request.user,
+            description=request.POST.get('description', ''),
+        )
+
+        return redirect('user_registration')  
+    return render(request, 'members/renew.html')
 
 def gallery(request):
     gallery_objects = GalleryManagement.objects.all()

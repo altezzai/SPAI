@@ -6,13 +6,36 @@
 <link rel="stylesheet" href="{% static 'css/sub/content.css' %}">
 <link rel="stylesheet" href="{% static 'css/spai.css' %}">
 <link rel="stylesheet" href="{% static 'css/sub/reg.css' %}">
+<style>
+    .renew-btn-container {
+        display: flex;
+        justify-content: end;
+        padding-inline: 200px;
+    }
+    .renew-btn {
+        background-color: rgb(0, 0, 0);
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        width:fit-content;
+        text-align: center;
+    }
+</style>
 {% endblock %}
 {% block header %}
 {% include 'header.html' %}
 {% endblock %}
 
 {% block content %}
-<div class="grid-container">
+<div class="renew-btn-container">
+
+    
+    <a class="renew-btn" href="{% url 'renew' %}">
+        Renew Membership
+    </a>
+</div>
+<div class="grid-container" style="padding-top: 0;">
     <div class="reg-form-section">
         <div class="reg-content-section">
             <p class="member-registration-header">Registration</p>
