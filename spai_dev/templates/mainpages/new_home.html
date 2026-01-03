@@ -103,7 +103,6 @@
     </p>
 </div>
 {% endif %}
-
 {% if request.user.is_authenticated and request.user.status == 'admin_approved' and request.user.annual_subscription is False %}
 <div class="information-text-right">
     <p><span>Hi {{request.user.first_name}} {{request.user.last_name}}, you don't have SPAI annual subscription.</span>

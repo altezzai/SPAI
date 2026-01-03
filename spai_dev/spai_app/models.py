@@ -180,23 +180,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return str(self.email)
 
-class RenewMembership(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='renew_membership')
-    file = models.FileField(upload_to=renew_proof_path, null=True, blank=True)
-    description = models.TextField(blank=True, null=True)
-    isApproved = models.BooleanField(default=False)
-
-    def delete(self, *args, **kwargs):
-        if self.file and os.path.exists(self.file.path):
-            try:
-                os.remove(self.file.path)
-            except FileNotFoundError:
-                # The file has already been deleted, so we can skip this step
-                pass
-        super(EventManagement, self).delete(*args, **kwargs)
-
-    def __str__(self):
-        return str(self.title)
 
 class UserDetailModel(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_details')
