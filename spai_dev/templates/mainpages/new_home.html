@@ -106,7 +106,7 @@
 {% if request.user.is_authenticated and request.user.status == 'admin_approved' and request.user.annual_subscription is False %}
 <div class="information-text-right">
     <p><span>Hi {{request.user.first_name}} {{request.user.last_name}}, you don't have SPAI annual subscription.</span>
-        <a class="scrolling-text" href="{% url 'annual_sub_payment' request.user.slug_value %}"
+        <a class="scrolling-text" href="{% url 'annual_sub_payment' %}"
             style="text-decoration: none;">click here</a> to Subscribe. If you are submitted documents please wait for admin approval
     </p>
 </div>
