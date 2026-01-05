@@ -21,34 +21,24 @@
             </div>
             <div class="president-wrapper">
                 <div class="president-pic">
-                    <img src="{% static 'image/TREASURER.png' %}" alt="">
+                    {% if finance and finance.image %}
+                        <img src="{{ finance.image.url }}" alt="{{ finance.name }}">
+                    {% else %}
+                        <img src="{% static 'image/TREASURER.png' %}" alt="Finance Secretary placeholder">
+                    {% endif %}
                 </div>
                 <div class="president-content">
-                    <h2 style="margin-bottom: 0%;">Prof (Dr.) Mahendra Kumar Singh</h2>
+                    <h2 style="margin-bottom: 0%;">{{ finance.name|default:"Finance Secretary" }}</h2>
                     <div class="positext">
-                        Finance Secretary of SPAI
+                        {{ finance.role|default:"Finance Secretary of SPAI" }}
                     </div>
                     <p style="margin-top: 0%;">
-                        Dr. Mahendra Kumar Singh is a renowned Professor of Sports Psychology in the Department of
-                        Sports Psychology at Lakshmibai National Institute of Physical Education ( Under the Ministry of
-                        Youth Affairs & Sports), Gwalior, Madhya Pradesh. Presently he is also having additional
-                        responsibility of Controller of Examination, LNIPE, Gwalior, Madhya Pradesh, India.
+                        {% if finance and finance.description %}
+                            {{ finance.description|linebreaks }}
+                        {% else %}
+                            Details will be updated soon.
+                        {% endif %}
                     </p>
-                    <p style="margin-top: 0%;">
-                        He is engaged in teaching since more than last 31 Years; out which more than 19 years in
-                        teaching & research at Postgraduate & Ph.D. Level. Prof. Singh has numerous Administrative
-                        Experiences such as Former Incharge Registrar, LNIPE, Gwalior; Former Dean Academics, LNIPE,
-                        Gwalior, Former Dean Sport Sciences, LNIPE, Gwalior, Former Dean Physical Education and Applied
-                        Areas, Former HOD, Department of Sport Psychology, LNIPE, Gwalior. Prof. Singh has Authored Five
-                        Books on different subjects of Physical Education & Sports; and has published More than 50
-                        Research Papers in International/National Journals. He has presented more than 35 papers at
-                        International/National Level Conference/Seminars. Beside all above he has many other Academic
-                        and Administrative Experiences at different University/ Higher Educational Level. Prof. Singh
-                        has Successfully Guided Ten Ph.D Scholars and three at present doing Ph.D. under his
-                        supervision. Presently Dr Mahendra Kumar Singh is the Finance Secreatry of Sports Psychology
-                        Association of India.
-                    </p>
-
                 </div>
             </div>
 

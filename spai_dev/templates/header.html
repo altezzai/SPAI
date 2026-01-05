@@ -1,100 +1,97 @@
 {% load static %}
 <header>
-    <div class="top-row">
-        <div class="spai-name"><a href="{% url 'index' %}">
+  <div class="top-row">
+    <div class="spai-name">
+      <a href="{% url 'index' %}"><img src="{% static 'image/SPAI_LOGO-removebg.png' %}" alt="Company Logo" class="logo" /></a>
+      <div class="spai-row">
+        <span class="company-name">SPORTS PSYCHOLOGY ASSOCIATION OF INDIA</span>
+        <div class="registration-name">Affiliated to International Society of Sports Psychology (ISSP) Registered Under the Societies Registration Act. XXI of 1860</div>
+      </div>
+    </div>
 
-                <img src="{% static 'image/SPAI_LOGO-removebg.png' %}" alt="Company Logo" class="logo"> </a>
-            <div class="spai-row">
-                <span class="company-name">SPORTS PSYCHOLOGY ASSOCIATION OF INDIA</span>
-                <div class="registration-name">
-                    Affiliated to International Society of Sports Psychology (ISSP)
-                    Registered Under the Societies Registration Act. XXI of 1860
-                </div>
+    <div class="contact-info">
+      <span class="email">
+        <img src="{% static 'image/email.svg' %}" alt="Email Icon" />
+        secretaryspai@gmail.com
+      </span>
+      {% if request.user.user_role == 1 or request.user.executive == 1 or request.user.executive == 2 %}
+        <div class="refresh-btn">
+          <a href="{% url 'manage_dashboard' %}">Manage dashboard</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="sep">
+      {% if not request.user.is_authenticated %}
+        <div class="login-button">
+          <a style="text-decoration: none; color: white;" href="{% url 'login_page' %}">Member Login</a>
+        </div>
+      {% else %}
+        <div class="user-profile-container">
+          {% if present %}
+            <div class="user-profile-icon" id="userProfileIcon">
+              <img src="{{ loc }}" alt="User Profile" />
             </div>
-
+          {% else %}
+            <div class="user-profile-icon" id="userProfileIcon">
+              <img src="{% static 'image/profilecheck.svg' %}" alt="User Profile" />
+            </div>
+          {% endif %}
+          <div class="dropdown-menu3" id="dropdownMenu3">
+            <a style="font-weight:500;font-size:14px;" class="down" href="{% url 'individual_user_details' request.user.slug_value %}">
+              <img src="{% static 'image/profilecheck.svg' %}" alt="" />
+              Profile
+            </a>
+            <a style="font-weight:500;font-size:14px;" class="down" href="{% url 'logout' %}">
+              <img src="{% static 'image/logout.svg' %}" alt="" />
+              Logout
+            </a>
+          </div>
         </div>
 
-        <div class="contact-info">
-            <span class="email"><img src="{% static 'image/email.svg' %}" alt="Email Icon">
-                secretaryspai@gmail.com</span>
-        </div>
-
-        <div class="sep">
-            {% if not request.user.is_authenticated %}
-            <div class="login-button">
-                <a style="text-decoration: none; color: white;" href="{% url 'login_page' %}">Member Login</a>
-            </div>
-            {% else %}
-            <div class="user-profile-container">
-                {% if present %}
-                <div class="user-profile-icon" id="userProfileIcon">
-                    <img src="{{loc}}" alt="User Profile">
-                </div>
-                {% else %}
-                <div class="user-profile-icon" id="userProfileIcon">
-                    <img src="{% static 'image/profilecheck.svg' %}" alt="User Profile">
-                </div>
-                {% endif %}
-                <div class="dropdown-menu3" id="dropdownMenu3">
-                    <a style="font-weight:500;font-size:14px;" class="down" href="{% url 'individual_user_details' request.user.slug_value %}">
-                        <img src="{% static 'image/profilecheck.svg' %}" alt="">
-                        Profile
-                    </a>
-                    <a style="font-weight:500;font-size:14px;" class="down" href="{% url 'logout' %}">
-                        <img src="{% static 'image/logout.svg' %}" alt="">
-                        Logout
-                    </a>
-
-                </div>
-            </div>
-
-            <!-- <div class="user-profile-icon">
+        <!--        <div class="user-profile-icon">
                 <a href="{% url 'individual_user_details' request.user.slug_value %}">
                 <a href="{% url 'logout' %}">
                     <img src="{% static 'image/member2.png'%}" alt="">
                 </a>
-            </div> -->
-            {% endif %}
-            <div>
-                
-            </div>
-            <div class="menu-icon">
-                <img src="{% static 'image/menu.svg' %}" alt="Menu Icon">
-            </div>
-        </div>
-        {% if request.user.is_authenticated %}
-
-        {% endif %}
-
+            </div>        -->
+      {% endif %}
+      <div></div>
+      <div class="menu-icon">
+        <img src="{% static 'image/menu.svg' %}" alt="Menu Icon" />
+      </div>
     </div>
-    <hr class="hrline">
-    <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelector('.menu-icon').addEventListener('click', function () {
-                document.querySelector('.navbar').classList.toggle('active');
-            });
-        });
+    {% if request.user.is_authenticated %}
 
-        document.getElementById('userProfileIcon').addEventListener('click', function () {
-            var dropdownMenu = document.getElementById('dropdownMenu3');
-            dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
-        });
-
-        // Close the dropdown if the user clicks outside of it
-        window.onclick = function (event) {
-            if (!event.target.matches('.user-profile-icon img')) {
-                var dropdowns = document.getElementsByClassName('dropdown-menu3');
-                for (var i = 0; i < dropdowns.length; i++) {
-                    var openDropdown = dropdowns[i];
-                    if (openDropdown.style.display === 'block') {
-                        openDropdown.style.display = 'none';
-                    }
-                }
-            }
+    {% endif %}
+  </div>
+  <hr class="hrline" />
+  <script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelector('.menu-icon').addEventListener('click', function () {
+        document.querySelector('.navbar').classList.toggle('active')
+      })
+    })
+    
+    document.getElementById('userProfileIcon').addEventListener('click', function () {
+      var dropdownMenu = document.getElementById('dropdownMenu3')
+      dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block'
+    })
+    
+    // Close the dropdown if the user clicks outside of it
+    window.onclick = function (event) {
+      if (!event.target.matches('.user-profile-icon img')) {
+        var dropdowns = document.getElementsByClassName('dropdown-menu3')
+        for (var i = 0; i < dropdowns.length; i++) {
+          var openDropdown = dropdowns[i]
+          if (openDropdown.style.display === 'block') {
+            openDropdown.style.display = 'none'
+          }
         }
-
-    </script>
-    {% block menu %}
+      }
+    }
+  </script>
+  {% block menu %}
     {% include 'navbar.html' %}
-    {% endblock %}
+  {% endblock %}
 </header>

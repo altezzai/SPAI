@@ -74,6 +74,17 @@ urlpatterns = [
 
     # rest api
     path('life-members', views.create_or_update_life_member, name='life-members'),
-    path('user/data/ingestion', views.BulkDataIngestionAPIView.as_view())
+    path('user/data/ingestion', views.BulkDataIngestionAPIView.as_view()),
 
+    # manage dashboard
+    path('manage-dashboard/', views.dashboard_view, name='manage_dashboard'),
+    path('leadership/create/', views.create_leadership, name='create_leadership'),
+    path('edit/leadership/<int:pk>/', views.edit_leadership, name='edit_leadership'),
+    path('delete/leadership/<int:pk>/', views.delete_leadership, name='delete_leadership'),
+    
+    # API endpoints for AJAX operations
+    path('api/create/<str:type>/', views.api_create, name='api_create'),
+    path('api/update/<str:type>/<int:pk>/', views.api_update, name='api_update'),
+    path('api/delete/<str:type>/<int:pk>/', views.api_delete, name='api_delete'),
+    # path('edit/internship/<int:pk>/', views.edit_internship, name='edit_internship'),
 ]

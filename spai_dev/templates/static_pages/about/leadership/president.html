@@ -26,27 +26,24 @@
             </div>
             <div class="president-wrapper">
                 <div class="president-pic">
-                    <img src="{% static 'image/PRESIDENT.png' %}" alt="">
+                    {% if president and president.image %}
+                        <img src="{{ president.image.url }}" alt="{{ president.name }}">
+                    {% else %}
+                        <img src="{% static 'image/PRESIDENT.png' %}" alt="President placeholder">
+                    {% endif %}
                 </div>
                 <div class="president-content">
-                    <h2 style="margin: 0%;">Dr. Anil Karwande</h2>
+                    <h2 style="margin: 0%;">{{ president.name|default:"President" }}</h2>
                     <div class="positext">
-                        President of SPAI
+                        {{ president.role|default:"President of SPAI" }}
                     </div>
                     <p>
-                        Dr Anil Karwande is President of Sports Psychology Association of India. Dr Anil has done his PhD in
-                        Physical Education. He’s the founder of NET JRF GURUKUL. He’s the academic counselor for Solapur University
-                        and the Vice-President Vishwa Punarnirman Sangh. He is the Former Principal of IDCPE Nagpur and a former
-                        member board of Management LNIPE Deemed University Gwalior. He's working on a project to Increase awareness
-                        of entry into the Defense Forces. He is the President of KREEDA BHARTI Vidarbha-Prant and Maharashtra. He
-                        has received a letter of Recognition by Indian Association of Sports Medicine for the upliftment of Sports
-                        Medicine in the country.He has received Rajiv Gandhi Education Excellence Award given by the Indian Society
-                        Council. He has received Bharat Vidya Ratan Award 2010 given by the Health and Development Association. He
-                        has received the Ideal Teacher Award 2013 given by Maharastra State Physical & Educational Teacher
-                        Association. He has participated in more than 100 seminars and conference at national and international
-                        level.
+                        {% if president and president.description %}
+                            {{ president.description|linebreaks }}
+                        {% else %}
+                            Details will be updated soon.
+                        {% endif %}
                     </p>
-                    
                 </div>
             </div>
             

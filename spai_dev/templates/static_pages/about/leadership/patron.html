@@ -26,38 +26,23 @@
             </div>
             <div class="president-wrapper">
                 <div class="president-pic">
-                    <img src="{% static 'image/Kamlesh.png' %}" alt="">
+                    {% if patron and patron.image %}
+                        <img src="{{ patron.image.url }}" alt="{{ patron.name }}">
+                    {% else %}
+                        <img src="{% static 'image/Kamlesh.png' %}" alt="Patron placeholder">
+                    {% endif %}
                 </div>
                 <div class="president-content">
-                    <h2>Prof. (Dr.) M.L. Kamlesh</h2>
+                    <h2>{{ patron.name|default:"Patron" }}</h2>
                     <div class="positext">
-                        Patron of SPAI
+                        {{ patron.role|default:"Patron of SPAI" }}
                     </div>
                     <p>
-                        Decorated with the accolade of Doctor of Science by the Open International University of
-                        Medicina Alternativa, Colombo (Sri Lanka) for his outstanding contribution to the science of
-                        physical education, Professor M.L. Kamlesh (b.1940), M.A. (English), M.Ed. (Physical Education),
-                        Ph.D., well-known for excellence in academics, research, sport psychology and administration in
-                        India and abroad, occupies the top-spot among the fraternity of physical educationists in the
-                        country. Dr. Kamlesh has authored 29 books and published more than 72 research papers and 62
-                        articles in national and international journals and periodicals and given 77 keynote addresses
-                        and invited lectures at various national (181) and international conferences (30).This former
-                        Principal, of the Sports Authority of India’s Laxmibai National College of Physical Education,
-                        Thiruvananthapuram, and former Dean, Faculty of Physical Education, University of Kerala, with
-                        an outstanding career of more than 45 years, was the founder member of Sports Psychology
-                        Association of India, which he very successfully served first as Secretary General for two
-                        terms, and then as President for next two terms. He has been bestowed upon Life-time Achievement
-                        Award by(1) Sports Psychology Association of India in 2004 for distinguished role in the
-                        development of sport psychology in the country; (2) the Alumni Association of Physical
-                        Education, Jiwaji University, Gwalior in 2005; (3) University of Delhi (2011); (4) by Punjabi
-                        University, Patiala (2012); and by (5) Guru scientist, University, Amritsar (2014) for rendering
-                        outstanding service to physical education and sport as a teacher, a researcher, a scientist and
-                        an administrator. He was awarded ASPASP Fellowshipat the 8th International Congress of
-                        Asian-South Pacific Association of Sport Psychology, June 29-July 3, 2018, organized by the
-                        Korean Society of Sport Psychology at Keimyung University, Deagu, Republic Korea. SPAI
-                        Presidential Award – 2023 for Excellence in Promoting Sports Psychology. Awarded at Dr. Ambedkar
-                        College, Deekasha Bhoomi, Nagpur on 28 March 2023 at the closing of the 30th National Conference
-                        of Sports Psychology.
+                        {% if patron and patron.description %}
+                            {{ patron.description|linebreaks }}
+                        {% else %}
+                            Details will be updated soon.
+                        {% endif %}
                     </p>
 
                 </div>

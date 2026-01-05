@@ -21,7 +21,7 @@ from rest_framework.views import APIView
 
 from . import models, forms
 from .models import GalleryManagement, User, EventManagement, UserDetailModel, GalleryImage, PaymentModel, Testimonials, \
-    AnnualSubscriptionModel, SubscriptionPayment, BannerEvents
+    AnnualSubscriptionModel, SubscriptionPayment, BannerEvents, Leadership 
 from .decorators import admin_only, authenticated_only
 from .utils import render_to_pdf, get_registration_num, get_research_paper_no, send_mail_to_executives, \
     send_password_reset_email, update_subscription_status, send_contact_us_mail
@@ -32,6 +32,79 @@ from django.utils import timezone
 from .models import LifeMembers
 from .serializers import LifeMembersSerializer, UserSerializer, UserDetailSerializer, PaymentSerializer, \
     AnnualSubscriptionSerializer, SubscriptionPaymentSerializer
+
+# Data dashboard :
+from .forms import LeadershipForm
+from django.http import JsonResponse
+
+# AJAX API Views for Dashboard CRUD Operations
+@csrf_exempt
+def api_create_leadership(request):
+    if request.method == 'POST':
+        form = LeadershipForm(request.POST, request.FILES)
+        if form.is_valid():
+            item = form.save()
+            return JsonResponse({
+                'success': True,
+                'item': {
+                    'id': item.id,
+                    'name': item.name,
+                    'role': item.role,
+                    'description': item.description,
+                    'image_url': item.image.url if item.image else None
+                }
+            })
+        else:
+            return JsonResponse({'success': False, 'message': 'Invalid form data', 'errors': form.errors})
+    return JsonResponse({'success': False, 'message': 'Invalid request method'})
+
+@csrf_exempt
+def api_update_leadership(request, pk):
+    item = get_object_or_404(Leadership, pk=pk)
+    if request.method == 'POST':
+        form = LeadershipForm(request.POST, request.FILES, instance=item)
+        if form.is_valid():
+            item = form.save()
+            return JsonResponse({
+                'success': True,
+                'item': {
+                    'id': item.id,
+                    'name': item.name,
+                    'role': item.role,
+                    'description': item.description,
+                    'image_url': item.image.url if item.image else None
+                }
+            })
+        else:
+            return JsonResponse({'success': False, 'message': 'Invalid form data'})
+    return JsonResponse({'success': False, 'message': 'Invalid request method'})
+
+@csrf_exempt
+def api_delete_leadership(request, pk):
+    item = get_object_or_404(Leadership, pk=pk)
+    if request.method == 'POST':
+        item.delete()
+        return JsonResponse({'success': True, 'message': 'Item deleted successfully'})
+    return JsonResponse({'success': False, 'message': 'Invalid request method'})
+
+# Generic API handlers that route to specific models based on type
+@csrf_exempt
+def api_create(request, type):
+    if type == 'leadership':
+        return api_create_leadership(request)
+    return JsonResponse({'success': False, 'message': 'Invalid type'})
+
+@csrf_exempt
+def api_update(request, type, pk):
+    if type == 'leadership':
+        return api_update_leadership(request, pk)
+    return JsonResponse({'success': False, 'message': 'Invalid type'})
+
+@csrf_exempt
+def api_delete(request, type, pk):
+    if type == 'leadership':
+        return api_delete_leadership(request, pk)
+    return JsonResponse({'success': False, 'message': 'Invalid type'})
 
 
 # Frequently used methods
@@ -144,12 +217,22 @@ def about_page(request):
     if page == "message_from_secretary":
         return render(request, 'static_pages/about/msgsecretary.html', context)
     if page == "president":
+        president = Leadership.objects.filter(role__icontains='president').first()
+        context["president"] = president
         return render(request, 'static_pages/about/leadership/president.html', context)
     if page == "secretary":
+        secretary = Leadership.objects.filter(role__icontains='secretary').first()
+        context["secretary"] = secretary
         return render(request, 'static_pages/about/leadership/secretary.html', context)
     if page == "finance_secretary":
+        finance = Leadership.objects.filter(role__icontains='finance').first()
+        if not finance:
+            finance = Leadership.objects.filter(role__icontains='treasurer').first()
+        context["finance"] = finance
         return render(request, 'static_pages/about/leadership/finance.html', context)
     if page == "patron":
+        patron = Leadership.objects.filter(role__icontains='patron').first()
+        context["patron"] = patron
         return render(request, 'static_pages/about/leadership/patron.html', context)
     if page == "committee":
         return render(request, 'static_pages/about/leadership/committee.html', context)
@@ -519,6 +602,7 @@ def add_image_template(request):
         frm = forms.GalleryManagementForm()
     context = {'page': 'gallery', 'frm': frm}
     return render(request, 'admin/add_image_template.html', context)
+
 
 
 def user_login(request):
@@ -1496,3 +1580,59 @@ def user_role_switch(request, *args, **kwargs):
         pass
     user.save()
     return redirect('individual_user_details', slug=user.slug_value)
+
+
+
+
+
+# Data Dashboard 
+def dashboard_view(request):
+    leadership_data = Leadership.objects.all()
+    # internship_data = Internship.objects.all()
+    
+    context = {
+        'leadership_data': leadership_data,
+        #'internship_data': internship_data,
+    }
+    return render(request, 'admin/data_dashboard.html', context)
+
+def edit_leadership(request, pk):
+    item = get_object_or_404(Leadership, pk=pk)
+    if request.method == 'POST':
+        form = LeadershipForm(request.POST, request.FILES, instance=item)
+        if form.is_valid():
+            form.save()
+            return redirect('manage_dashboard') # Redirect back to dashboard
+    else:
+        form = LeadershipForm(instance=item)
+    return render(request, 'edit_item.html', {'form': form, 'title': 'Edit Leadership'})
+
+def create_leadership(request):
+    if request.method == 'POST':
+        form = LeadershipForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Leadership member added successfully!')
+            return redirect('manage_dashboard')
+    else:
+        form = LeadershipForm()
+    return render(request, 'edit_item.html', {'form': form, 'title': 'Add Leadership Member'})
+
+def delete_leadership(request, pk):
+    item = get_object_or_404(Leadership, pk=pk)
+    if request.method == 'POST':
+        item.delete()
+        messages.success(request, 'Leadership member deleted successfully!')
+        return redirect('manage_dashboard')
+    return render(request, 'confirm_delete.html', {'item': item, 'item_type': 'Leadership'})
+
+# def edit_internship(request, pk):
+#     item = get_object_or_404(Internship, pk=pk)
+#     if request.method == 'POST':
+#         form = InternshipForm(request.POST, request.FILES, instance=item)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('manage_dashboard')
+#     else:
+#         form = InternshipForm(instance=item)
+#     return render(request, 'edit_item.html', {'form': form, 'title': 'Edit Internship'})

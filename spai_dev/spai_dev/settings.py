@@ -76,8 +76,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',  # MySQL backend
         'NAME': 'spai',  # Database name
-        'USER': 'root',  # Database user
-        'PASSWORD': '',  # Database password
+        'USER': 'mysql',  # Database user
+        'PASSWORD': 'root',  # Database password
         'HOST': 'localhost',  # Database host, use 'localhost' or the IP of your MySQL server
         'PORT': '3306',  # MySQL default port
     }

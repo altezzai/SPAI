@@ -4,7 +4,7 @@ from django.conf import settings
 from django.contrib.auth.hashers import check_password
 from django.forms import ModelForm, modelformset_factory
 from .models import GalleryManagement, UserDetailModel, User, EventManagement, PaymentModel, InternshipApplication, \
-    Manuscript, Author, SubscriptionPayment, Testimonials, ContactUs, EventDocumentModel, JournalQuery
+    Manuscript, Author, SubscriptionPayment, Testimonials, ContactUs, EventDocumentModel, JournalQuery, Leadership
 from django import forms
 
 
@@ -262,3 +262,15 @@ class EventDocumentForm(forms.ModelForm):
     class Meta:
         model = EventDocumentModel
         fields = ['title', 'file']
+
+
+# Data Dashboard 
+class LeadershipForm(forms.ModelForm):
+    class Meta:
+        model = Leadership
+        fields = '__all__'
+
+# class InternshipForm(forms.ModelForm):
+#     class Meta:
+#         model = Internship
+#         fields = '__all__'
