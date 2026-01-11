@@ -1,106 +1,48 @@
 {% extends 'main.html' %}
 {% load static %}
 {% block cssfiles %}
-<link rel="stylesheet" href="{% static 'css/sub/header.css' %}">
-<link rel="stylesheet" href="{% static 'css/sub/footer.css' %}">
-<link rel="stylesheet" href="{% static 'css/sub/content.css' %}">
+  <link rel="stylesheet" href="{% static 'css/sub/header.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/sub/footer.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/sub/content.css' %}" />
 {% endblock %}
 
 {% block header %}
-{% include 'header.html' %}
+  {% include 'header.html' %}
 {% endblock %}
 
 {% block content %}
-<div class="about-container mission run-repeat">
+  <div class="about-container mission run-repeat">
     <div class="mission-top-row">
-        <h1 style="margin-bottom: 0%;">PREVIOUS COUNCIL MEMBERS OF SPAI</h1>
+      <h1 style="margin-bottom: 0%;">PREVIOUS COUNCIL MEMBERS OF SPAI</h1>
     </div>
     <div class="mission-vission">
+      {% for member in previous_members %}
         <div class="m-v-container">
-            <div style="display: flex;align-items: center;">
+          <div style="display: flex;align-items: center;"></div>
+          <div class="president-wrapper">
+            <div class="president-pic">
+              {% if member.image %}
+                <img src="{{ member.image.url }}" alt="{{ member.name }}" />
+              {% else %}
+                <img src="{% static 'image/profile-icon.svg' %}" alt="placeholder" />
+              {% endif %}
             </div>
-            <div class="president-wrapper">
-                <div class="president-pic">
-                    <img src="{% static 'image/committee/7.png' %}" alt="">
-                </div>
-                <div class="president-content">
-                    <h2>Sr. Prof Dilip Kumar Dureha</h2>
-                    <div class="positext">
-                        Previous President of SPAI
-                    </div>
-                    <p>Prof Dilip Kumar Dureha was the former Vice-Chancellor of Lakshmibhai National Institute of
-                        Physical Education, Gwalior (M.P). He is the Nominee of Governor of Tamil Nadu as Convenor for
-                        the search committee for the selection of Vice-Chancellor. Lifetime Achievement Award for his
-                        contribution in the field of Physical Education and Sports Psychology. Past President & Patron
-                        of Sports Psychology Association of India. Expert member selection committee in Physical
-                        Education and applied sciences in different universities. Executive member of the Managing
-                        Council of Asia South Pacific Association of Sports. Several Research papers in ASPASP & ISSP
-                        Conferences, journals and proceedings in INDIA. 24 Ph.D. scholars have been awarded PhD under
-                        his supervision. </p>
-
-                </div>
+            <div class="president-content">
+              <h2>{{ member.name }}</h2>
+              <div class="positext">Previous {{ member.role }} of SPAI</div>
+              <p>{{ member.description|linebreaks }}</p>
             </div>
-
+          </div>
         </div>
-        <div class="m-v-container">
-            <div style="display: flex;align-items: center;">
-            </div>
-            <div class="president-wrapper">
-                <div class="president-pic">
-                    <img src="{% static 'image/committee/5.png' %}" alt="">
-                </div>
-                <div class="president-content">
-                    <h2>Dr. Anuradha. S. Solanky</h2>
-                    <div class="positext">
-                        Previous Secretary of SPAI
-                    </div>
-                    <p>
-                        Dr. Anuradha. S. Solanky completed her M.Phil&Ph.D in Psychology from Bangalore University in
-                        the year 1989-1998. Currently employed with “Sports Authority of India” as Sports Psychologist,
-                        since July 1993.Job profile includes Research, Providing Psychological support to Indian
-                        National teams, Counseling, Teaching (Diploma & Refresher Course), mental training,
-                        psychological testing & Assessment. Trained under Russian Psychologist, Attended Sports Science
-                        training in University of Birmingham & Certification of “Mind room training” by Dr. Pierre
-                        Beauchamp, Canada. Member of Academic council, paper setter & Examiner for many Universities.
-                        Life member of Sports Psychology Association of India (SPAI) and Indian Association of Sports
-                        Medicine (IASM) also member of International Society of Sports Psychology (ISSP). Attended
-                        Sports Science course at University of Birmingham (UK) in the year 2016. Attended many National
-                        & International conferences, Seminars, workshops. Presented research papers, conducted Seminars
-                        & educational programs for Coaches, Athletes, Physical Educationists etc.
-                    </p>
-
-                </div>
-            </div>
-
-        </div>
-        <div class="m-v-container" style="width: 90%;">
-            <div style="display: flex;align-items: center;">
-            </div>
-            <div class="president-wrapper">
-                <div class="president-pic">
-                    <img src="{% static 'image/profile-icon.svg' %}" alt="">
-                </div>
-                <div class="president-content">
-                    <h2>Keshav Singh Gujjar </h2>
-                    <div class="positext">
-                        Previous Finance Secretary
-                    </div>
-
-                </div>
-            </div>
-
-        </div>
-        
+      {% empty %}
+        <p>No previous council members found.</p>
+      {% endfor %}
     </div>
-
-</div>
-
-
+  </div>
 {% endblock %}
-
 {% block footer %}
-{% include 'footer.html' %}
+  {% include 'footer.html' %}
 {% endblock %}
 {% block jsfile %}
-<script type="text/javascript" src="{% static 'js/sub/news.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/sub/news.js' %}"></script>
 {% endblock %}

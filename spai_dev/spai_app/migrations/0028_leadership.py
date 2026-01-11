@@ -18,6 +18,8 @@ class Migration(migrations.Migration):
                 ('role', models.CharField(max_length=100)),
                 ('description', models.TextField()),
                 ('image', models.ImageField(upload_to='leadership_pics/')),
+                ('is_current', models.BooleanField(default=True)),
+                ('region', models.CharField(blank=True, choices=[('north', 'North'), ('east', 'East'), ('west', 'West'), ('south', 'South'), ('central', 'Central')], max_length=20, null=True)),
             ],
         ),
     ]

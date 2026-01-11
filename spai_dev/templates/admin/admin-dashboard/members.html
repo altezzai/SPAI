@@ -1,0 +1,391 @@
+<style>
+  /* --- Local Styles for Members Section --- */
+  .controls-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .btn-filter {
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--text-muted);
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+
+  .btn-filter:hover {
+    background: var(--light);
+    color: var(--primary);
+  }
+
+  .btn-filter.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* Search Bar Styles */
+  .search-group {
+    display: flex;
+    gap: 8px;
+    min-width: 300px;
+  }
+
+  .search-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    outline: none;
+  }
+
+  .search-input:focus {
+    border-color: var(--primary);
+  }
+
+  .btn-search {
+    padding: 8px 16px;
+    background: var(--dark);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+
+  .btn-search:hover {
+    background: black;
+  }
+
+  /* --- STATUS BADGE COLORS --- */
+  .status-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    display: inline-block;
+    margin-bottom: 4px;
+    white-space: nowrap;
+  }
+
+  /* 1. Admin Pending: Red */
+  .status-danger { 
+    background: #ffe5e5; 
+    color: #d32f2f; 
+    border: 1px solid #ffcdd2;
+  }
+
+  /* 2. President Pending: Orange */
+  .status-president { 
+    background: #fff3e0; 
+    color: #ef6c00; 
+    border: 1px solid #ffe0b2;
+  }
+
+  /* 3. Secretary Pending: Purple */
+  .status-secretary { 
+    background: #f3e5f5; 
+    color: #7b1fa2; 
+    border: 1px solid #e1bee7;
+  }
+
+  /* 4. Active: Green */
+  .status-success { 
+    background: #e8f5e9; 
+    color: #2e7d32; 
+    border: 1px solid #c8e6c9;
+  }
+
+  /* 5. Sub Expired: Blue */
+  .status-info { 
+    background: #e3f2fd; 
+    color: #0277bd; 
+    border: 1px solid #b3e5fc;
+  }
+
+  /* Pagination */
+  .pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    margin-top: 20px;
+  }
+
+  .page-info {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  .pagination-btns {
+    display: flex;
+    gap: 5px;
+  }
+
+  .btn-page {
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    background: white;
+    cursor: pointer;
+    border-radius: 4px;
+    min-width: 32px;
+  }
+
+  .btn-page.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+
+  .btn-page:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+</style>
+
+<div id="members" class="data-section">
+  <div class="section-header">
+    <h2>Members (Users)</h2>
+  </div>
+
+  <div class="controls-container">
+    <div class="filter-group">
+      <button class="btn-filter active" onclick="setCategory('all', this)">All</button>
+      <button class="btn-filter" onclick="setCategory('admin_not_approved', this)">Admin Pending</button>
+      <button class="btn-filter" onclick="setCategory('president_not_approved', this)">President Pending</button>
+      <button class="btn-filter" onclick="setCategory('secretary_not_approved', this)">Secretary Pending</button>
+      <button class="btn-filter" onclick="setCategory('renew_subscription', this)">Renew Sub</button>
+      <button class="btn-filter" onclick="setCategory('subscribed', this)">Subscribed</button>
+    </div>
+
+    <div class="search-group">
+      <input type="text" id="memberSearchInput" class="search-input" placeholder="Search name, email, username..." onkeyup="handleEnter(event)">
+      <button class="btn-search" onclick="runSearch()">Search</button>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width: 50px;">ID</th>
+          <th>Name</th>
+          <th>Email / Username</th>
+          <th>Current Status</th>
+        </tr>
+      </thead>
+      <tbody id="members-tbody">
+        {% if spai_app_user and spai_app_user.exists %}
+          {% for u in spai_app_user %}
+            <tr class="data-row" 
+                data-id="{{ u.id }}" 
+                data-name="{{ u.first_name }} {{ u.last_name }}"
+                data-username="{{ u.username }}"
+                data-email="{{ u.email }}"
+                data-admin="{{ u.admin_approved|yesno:'true,false' }}" 
+                data-president="{{ u.president_approval|yesno:'true,false' }}" 
+                data-secretary="{{ u.secretary_approval|yesno:'true,false' }}" 
+                data-annual="{{ u.annual_subscription|yesno:'true,false' }}">
+              
+              <td>#{{ u.id }}</td>
+              <td>
+                <div style="font-weight: 600; color: var(--dark);">
+                  {% if u.first_name or u.last_name %}
+                    {{ u.first_name }} {{ u.last_name }}
+                  {% else %}
+                    User_{{ u.id }}
+                  {% endif %}
+                </div>
+              </td>
+              <td>
+                <div style="font-size: 0.9em;">{{ u.email }}</div>
+                <div style="font-size: 0.8em; color: var(--text-muted);">@{{ u.username }}</div>
+              </td>
+              <td>
+                {% if u.admin_approved and u.president_approval and u.secretary_approval and u.annual_subscription %}
+                    <span class="status-badge status-success">Active Member</span>
+                {% else %}
+                    {% if not u.admin_approved %}
+                        <span class="status-badge status-danger">Waiting: Admin</span>
+                    {% endif %}
+                    
+                    {% if not u.president_approval %}
+                        <span class="status-badge status-president">Waiting: President</span>
+                    {% endif %}
+
+                    {% if not u.secretary_approval %}
+                        <span class="status-badge status-secretary">Waiting: Secretary</span>
+                    {% endif %}
+
+                    {% if u.admin_approved and u.president_approval and u.secretary_approval and not u.annual_subscription %}
+                         <span class="status-badge status-info">Subscription Expired</span>
+                    {% endif %}
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr id="no-data-row">
+            <td colspan="4" style="text-align:center; padding: 30px; color: var(--text-muted);">
+              No members found in the database.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination-container" id="paginationControls">
+    <div class="page-info">
+      Showing <span id="startCount">0</span> to <span id="endCount">0</span> of <span id="totalCount">0</span> entries
+    </div>
+    <div class="pagination-btns" id="paginationBtns"></div>
+  </div>
+</div>
+
+<script>
+  // --- Configuration ---
+  const ROWS_PER_PAGE = 10;
+  let currentPage = 1;
+  let currentCategory = 'all';
+  let currentSearchTerm = '';
+  let filteredRows = []; 
+
+  document.addEventListener('DOMContentLoaded', () => {
+    filterData();
+  });
+
+  // --- 1. Category Click Handler ---
+  function setCategory(category, btnElement) {
+    document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
+    if(btnElement) btnElement.classList.add('active');
+
+    currentCategory = category;
+    currentPage = 1; 
+    filterData();
+  }
+
+  // --- 2. Search Handler ---
+  function runSearch() {
+    const input = document.getElementById('memberSearchInput');
+    currentSearchTerm = input.value.trim().toLowerCase();
+    currentPage = 1; 
+    filterData();
+  }
+
+  function handleEnter(e) {
+    if (e.key === 'Enter') runSearch();
+  }
+
+  // --- 3. Master Filter Logic ---
+  function filterData() {
+    const allRows = Array.from(document.querySelectorAll('#members-tbody .data-row'));
+
+    filteredRows = allRows.filter(row => {
+      const isAdminApproved = row.dataset.admin === 'true';
+      const isPresApproved = row.dataset.president === 'true';
+      const isSecApproved = row.dataset.secretary === 'true';
+      const isSubscribed = row.dataset.annual === 'true';
+      
+      const name = (row.dataset.name || '').toLowerCase();
+      const user = (row.dataset.username || '').toLowerCase();
+      const email = (row.dataset.email || '').toLowerCase();
+      const searchString = `${name} ${user} ${email}`;
+
+      let categoryMatch = false;
+      switch (currentCategory) {
+        case 'all': 
+          categoryMatch = true; break;
+        case 'admin_not_approved': 
+          categoryMatch = !isAdminApproved; break;
+        case 'president_not_approved': 
+          categoryMatch = !isPresApproved; break;
+        case 'secretary_not_approved': 
+          categoryMatch = !isSecApproved; break;
+        case 'renew_subscription':
+          categoryMatch = (isAdminApproved && isPresApproved && isSecApproved && !isSubscribed); break;
+        case 'subscribed':
+          categoryMatch = isSubscribed; break;
+        default: categoryMatch = true;
+      }
+
+      const searchMatch = currentSearchTerm === '' || searchString.includes(currentSearchTerm);
+      return categoryMatch && searchMatch;
+    });
+
+    renderTable();
+  }
+
+  // --- 4. Render Table & Pagination ---
+  function renderTable() {
+    const allRows = document.querySelectorAll('#members-tbody .data-row');
+    allRows.forEach(row => row.style.display = 'none');
+
+    const totalItems = filteredRows.length;
+    const totalPages = Math.ceil(totalItems / ROWS_PER_PAGE);
+    
+    if (currentPage > totalPages) currentPage = totalPages || 1;
+    if (totalItems === 0) currentPage = 1;
+
+    const start = (currentPage - 1) * ROWS_PER_PAGE;
+    const end = start + ROWS_PER_PAGE;
+    
+    const rowsToShow = filteredRows.slice(start, end);
+    rowsToShow.forEach(row => row.style.display = '');
+
+    document.getElementById('totalCount').textContent = totalItems;
+    document.getElementById('startCount').textContent = totalItems > 0 ? start + 1 : 0;
+    document.getElementById('endCount').textContent = Math.min(end, totalItems);
+
+    renderPaginationButtons(totalPages);
+  }
+
+  function renderPaginationButtons(totalPages) {
+    const container = document.getElementById('paginationBtns');
+    container.innerHTML = ''; 
+
+    if (totalPages <= 1) return; 
+
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'btn-page';
+    prevBtn.innerText = '«';
+    prevBtn.disabled = currentPage === 1;
+    prevBtn.onclick = () => { currentPage--; renderTable(); };
+    container.appendChild(prevBtn);
+
+    for (let i = 1; i <= totalPages; i++) {
+      if (totalPages > 7 && Math.abs(currentPage - i) > 2 && i !== 1 && i !== totalPages) continue;
+      
+      const btn = document.createElement('button');
+      btn.className = `btn-page ${i === currentPage ? 'active' : ''}`;
+      btn.innerText = i;
+      btn.onclick = () => { currentPage = i; renderTable(); };
+      container.appendChild(btn);
+    }
+
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'btn-page';
+    nextBtn.innerText = '»';
+    nextBtn.disabled = currentPage === totalPages;
+    nextBtn.onclick = () => { currentPage++; renderTable(); };
+    container.appendChild(nextBtn);
+  }
+</script>

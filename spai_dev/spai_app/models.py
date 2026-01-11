@@ -405,6 +405,15 @@ class Leadership(models.Model):
     role = models.CharField(max_length=100)
     description = models.TextField()
     image = models.ImageField(upload_to='leadership_pics/')
+    is_current = models.BooleanField(default=True)
+    REGION_CHOICES = [
+        ('north', 'North'),
+        ('east', 'East'),
+        ('west', 'West'),
+        ('south', 'South'),
+        ('central', 'Central'),
+    ]
+    region = models.CharField(max_length=20, choices=REGION_CHOICES, null=True, blank=True)
 
     def __str__(self):
         return self.name

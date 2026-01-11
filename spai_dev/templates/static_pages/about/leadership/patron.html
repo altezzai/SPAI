@@ -1,65 +1,56 @@
 {% extends 'main.html' %}
 {% load static %}
 {% block cssfiles %}
-<link rel="stylesheet" href="{% static 'css/sub/header.css' %}">
-<link rel="stylesheet" href="{% static 'css/sub/footer.css' %}">
-<link rel="stylesheet" href="{% static 'css/sub/content.css' %}">
+  <link rel="stylesheet" href="{% static 'css/sub/header.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/sub/footer.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/sub/content.css' %}" />
 {% endblock %}
 
 {% block header %}
-{% include 'header.html' %}
+  {% include 'header.html' %}
 {% endblock %}
 
 {% block content %}
-<div class="about-container mission">
+  <div class="about-container mission">
     <div class="mission-top-row">
-        <h1 style="margin-bottom: 0%;">PATRON OF SPORTS PSYCHOLOGY ASSOCIATION OF INDIA</h1>
+      <h1 style="margin-bottom: 0%;">PATRON OF SPORTS PSYCHOLOGY ASSOCIATION OF INDIA</h1>
     </div>
     <div class="mission-vission">
-        <div class="m-v-container">
-            <div style="display: flex;align-items: center;">
-                <!-- <div class="mission-icon">
+      <div class="m-v-container">
+        <div style="display: flex;align-items: center;">
+          <!--    <div class="mission-icon">
                     <img class="pic-on" src="{% static 'image/football1.svg' %}" alt="">
                     <img class="pic-off" src="{% static 'image/football2.svg' %}" alt="">
-                </div> -->
-
-            </div>
-            <div class="president-wrapper">
-                <div class="president-pic">
-                    {% if patron and patron.image %}
-                        <img src="{{ patron.image.url }}" alt="{{ patron.name }}">
-                    {% else %}
-                        <img src="{% static 'image/Kamlesh.png' %}" alt="Patron placeholder">
-                    {% endif %}
-                </div>
-                <div class="president-content">
-                    <h2>{{ patron.name|default:"Patron" }}</h2>
-                    <div class="positext">
-                        {{ patron.role|default:"Patron of SPAI" }}
-                    </div>
-                    <p>
-                        {% if patron and patron.description %}
-                            {{ patron.description|linebreaks }}
-                        {% else %}
-                            Details will be updated soon.
-                        {% endif %}
-                    </p>
-
-                </div>
-            </div>
-
+                </div>    -->
         </div>
-
+        <div class="president-wrapper">
+          <div class="president-pic">
+            {% if patron and patron.image %}
+              <img src="{{ patron.image.url }}" alt="{{ patron.name }}" />
+            {% else %}
+              <img src="{% static 'image/profile-icon.svg' %}" alt="placeholder" />
+            {% endif %}
+          </div>
+          <div class="president-content">
+            <h2>{{ patron.name|default:'Patron' }}</h2>
+            <div class="positext">{{ patron.role|default:'Patron of SPAI' }}</div>
+            <p>
+              {% if patron and patron.description %}
+                {{ patron.description|linebreaks }}
+              {% else %}
+                Details will be updated soon.
+              {% endif %}
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
-
-</div>
-
-
+  </div>
 {% endblock %}
 
 {% block footer %}
-{% include 'footer.html' %}
+  {% include 'footer.html' %}
 {% endblock %}
 {% block jsfile %}
-<script type="text/javascript" src="{% static 'js/sub/news.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/sub/news.js' %}"></script>
 {% endblock %}

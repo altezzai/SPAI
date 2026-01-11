@@ -1,0 +1,75 @@
+<div id="leadership" class="data-section active">
+  <div class="section-header-container">
+    <div class="section-header">Leadership Team</div>
+    <button class="btn-create" onclick="openCreateModal('leadership')"><span>+ Add Member</span></button>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th class="col-name">Name</th>
+          <th class="col-role">Role</th>
+          <th class="col-region">Region</th>
+          <th class="col-status">Status</th>
+          <th class="col-desc">Description</th>
+          <th class="col-img">Profile</th>
+          <th class="col-actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="leadership-tbody">
+        {% for item in leadership_data %}
+          <tr class="data-row"
+            data-id="{{ item.pk }}"
+            data-type="leadership"
+            data-role="{{ item.role }}"
+            data-current="{% if item.is_current %}
+              
+              
+              1
+
+
+            {% else %}
+              
+              
+              0
+
+
+            {% endif %}"
+            data-region="{{ item.region }}">
+            <td>
+              <strong>{{ item.name }}</strong>
+            </td>
+            <td class="col-role">{{ item.role }}</td>
+            <td class="col-region">{{ item.region|default_if_none:'' }}</td>
+            <td class="col-status">
+              {% if item.is_current %}
+                Current
+              {% else %}
+                Previous
+              {% endif %}
+            </td>
+            <td class="description-cell">{{ item.description }}</td>
+            <td>
+              {% if item.image %}
+                <img src="{{ item.image.url }}" alt="{{ item.name }}" class="profile-pic" data-image="{{ item.image.url }}" />
+              {% else %}
+                <div class="profile-pic" style="background:#eee; display:flex; align-items:center; justify-content:center; color:#999; font-size:0.8rem;">No Img</div>
+              {% endif %}
+            </td>
+            <td>
+              <div class="action-group">
+                <button class="btn-icon btn-edit" onclick="openEditModal({{ item.pk }}, 'leadership')">Edit</button>
+                <button class="btn-icon btn-delete" onclick="openDeleteModal({{ item.pk }}, '{{ item.name }}', 'leadership')">Delete</button>
+              </div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="7" style="text-align:center; padding: 40px; color: var(--text-muted);">No leadership members found. Click "Add Member" to create one.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

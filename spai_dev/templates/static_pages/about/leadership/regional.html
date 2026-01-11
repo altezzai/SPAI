@@ -1,4 +1,5 @@
 {% extends 'main.html' %}
+
 {% load static %}
 {% block cssfiles %}
 <link rel="stylesheet" href="{% static 'css/sub/header.css' %}">
@@ -7,6 +8,7 @@
 {% endblock %}
 
 {% block header %}
+
 {% include 'header.html' %}
 {% endblock %}
 
@@ -17,132 +19,46 @@
     </div>
 
     <div class="regional mission-vission">
+        {% for region_name, members in regions_list %}
         <div class="reg m-v-container">
             <div style="display: flex;align-items: center;">
                 <div class="mission-icon">
                     <img class="pic-on" src="{% static 'image/navigation1.svg' %}" alt="">
                     <img class="pic-off" src="{% static 'image/navigation2.svg' %}" alt="">
                 </div>
-                <h3 style="margin-left: 10px;">North</h3>
+                <h3 style="margin-left: 10px;">{{ region_name }}</h3>
             </div>
+
+            {% for member in members %}
             <div class="president-wrapper">
                 <div class="president-pic" style="margin-top: 0%;margin-right: 10px;">
-                    <img src="{% static 'image/committee/12.png' %}" alt="">
+                    {% if member.image %}
+                        <img src="{{ member.image.url }}" alt="{{ member.name }}">
+                    {% else %}
+                        <img src="{% static 'image/profile-icon.svg' %}" alt="placeholder">
+                    {% endif %}
                 </div>
                 <div class="president-content">
-                    <h2 style="margin-bottom: 0%;margin-top: 30px;">Dr. Amanendra Mann</h2>
-                    <i>Associate Professor <br>
-                        DAV College, Chandigarh <br>
+                    <h2 style="margin-bottom: 0%;margin-top: 30px;">{{ member.name }}</h2>
+                    <i>{{ member.role }} <br>
+                        {{ member.description|linebreaksbr }}
                     </i>
 
                 </div>
             </div>
+            {% endfor %}
 
         </div>
-        <div class="reg m-v-container">
-            <div style="display: flex;align-items: center;">
-                <div class="mission-icon">
-                    <img class="pic-on" src="{% static 'image/navigation1.svg' %}" alt="">
-                    <img class="pic-off" src="{% static 'image/navigation2.svg' %}" alt="">
-                </div>
-                <h3 style="margin-left: 10px;">East</h3>
-            </div>
-            <div class="president-wrapper">
-                <div class="president-pic" style="margin-top: 0%;margin-right: 10px;">
-                    <img src="{% static 'image/committee/16sudarsan.png' %}" alt="">
-                </div>
-                <div class="president-content">
-                    <h2 style="margin-bottom: 0%;margin-top: 30px;">Dr. Sudarsan Biswas</h2>
-                    <i>Associate Professor <br>
-                        Visva Bharathi University <br>
-                        Shantiniketan, West Bengal <br>
-                    </i>
-
-                </div>
-            </div>
-
-        </div>
-        <div class="reg m-v-container">
-            <div style="display: flex;align-items: center;">
-                <div class="mission-icon">
-                    <img class="pic-on" src="{% static 'image/navigation1.svg' %}" alt="">
-                    <img class="pic-off" src="{% static 'image/navigation2.svg' %}" alt="">
-                </div>
-                <h3 style="margin-left: 10px;">South</h3>
-            </div>
-            <div class="president-wrapper">
-                <div class="president-pic" style="margin-top: 0%;margin-right: 10px;">
-                    <img src="{% static 'image/committee/20.png' %}" alt="">
-                </div>
-                <div class="president-content">
-                    <h2 style="margin-bottom: 0%;">Dr. Shahin Ahmed</h2>
-                    <i> Professor <br>
-                        Tamil Nadu Physical Education and Sports University <br>
-                        Chennai <br>
-                    </i>
-
-                </div>
-            </div>
-
-        </div>
-        <div class="reg m-v-container">
-            <div style="display: flex;align-items: center;">
-                <div class="mission-icon">
-                    <img class="pic-on" src="{% static 'image/navigation1.svg' %}" alt="">
-                    <img class="pic-off" src="{% static 'image/navigation2.svg' %}" alt="">
-                </div>
-                <h3 style="margin-left: 10px;">West</h3>
-            </div>
-            <div class="president-wrapper">
-
-                <div class="president-content">
-                    <h2 style="margin-bottom: 0%;">Dr. Neetu Joshi</h2>
-                    <i> Assistant Professor <br>
-                        B.P.C.A's College of Physical Education, <br>
-                        Wadala, Mumbai <br>
-                    </i>
-
-                </div>
-            </div>
-
-        </div>
-        <div class="reg m-v-container">
-            <div style="display: flex;align-items: center;">
-                <div class="mission-icon">
-                    <img class="pic-on" src="{% static 'image/navigation1.svg' %}" alt="">
-                    <img class="pic-off" src="{% static 'image/navigation2.svg' %}" alt="">
-                </div>
-                <h3 style="margin-left: 10px;">Central</h3>
-            </div>
-            <div class="president-wrapper">
-                <div class="president-pic" style="margin-top: 0%;margin-right: 10px;">
-                    <img src="{% static 'image/committee/17.png' %}" alt="">
-                </div>
-                <div class="president-content">
-                    <h2 style="margin-bottom: 0%;">Dr. Krishnakant Sahu </h2>
-                    <i> Associate Professor <br>
-                        LNIPE, Gwalior <br>
-                    </i>
-
-                </div>
-            </div>
-
-        </div>
-        <!-- <div class="m-v-container">
-            <div style="display: flex;align-items: center;">
-                <div class="mission-icon">
-                    <img class="pic-on" src="{% static 'image/navigation1.svg' %}" alt="">
-                    <img class="pic-off" src="{% static 'image/navigation2.svg' %}" alt="">
-                </div>
-                <h3 style="margin-left: 10px;">North</h3>
-            </div>
-            <i style="font-size: 16px;">Dr.Amanendra Mann <br>
-                Associate Professor <br>
-                DAV College, Chandigarh <br>
-            </i>
-        </div> -->
+        {% empty %}
+        <p>No regional secretaries found.</p>
+        {% endfor %}
 
     </div>
+
+</div>
+
+
+</div>
 
 </div>
 

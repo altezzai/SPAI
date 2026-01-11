@@ -51,7 +51,9 @@ def api_create_leadership(request):
                     'name': item.name,
                     'role': item.role,
                     'description': item.description,
-                    'image_url': item.image.url if item.image else None
+                    'image_url': item.image.url if item.image else None,
+                    'is_current': bool(item.is_current),
+                    'region': item.region or ''
                 }
             })
         else:
@@ -72,7 +74,9 @@ def api_update_leadership(request, pk):
                     'name': item.name,
                     'role': item.role,
                     'description': item.description,
-                    'image_url': item.image.url if item.image else None
+                    'image_url': item.image.url if item.image else None,
+                    'is_current': bool(item.is_current),
+                    'region': item.region or ''
                 }
             })
         else:
@@ -235,10 +239,22 @@ def about_page(request):
         context["patron"] = patron
         return render(request, 'static_pages/about/leadership/patron.html', context)
     if page == "committee":
+        committee_members = Leadership.objects.filter(is_current=True).order_by('name')
+        context['committee_members'] = committee_members
         return render(request, 'static_pages/about/leadership/committee.html', context)
     if page == "pre_committee":
+        previous_members = Leadership.objects.filter(is_current=False).order_by('name')
+        context['previous_members'] = previous_members
         return render(request, 'static_pages/about/leadership/previous_year.html', context)
     if page == "regional":
+        regions_list = [
+            ('North', Leadership.objects.filter(region='north').order_by('name')),
+            ('East', Leadership.objects.filter(region='east').order_by('name')),
+            ('South', Leadership.objects.filter(region='south').order_by('name')),
+            ('West', Leadership.objects.filter(region='west').order_by('name')),
+            ('Central', Leadership.objects.filter(region='central').order_by('name')),
+        ]
+        context['regions_list'] = regions_list
         return render(request, 'static_pages/about/leadership/regional.html', context)
 
 
@@ -1589,12 +1605,15 @@ def user_role_switch(request, *args, **kwargs):
 def dashboard_view(request):
     leadership_data = Leadership.objects.all()
     # internship_data = Internship.objects.all()
-    
+    # Use User model (spai_app_user) instead of LifeMembers
+    spai_app_user = User.objects.all()
+
     context = {
         'leadership_data': leadership_data,
         #'internship_data': internship_data,
+        'spai_app_user': spai_app_user,
     }
-    return render(request, 'admin/data_dashboard.html', context)
+    return render(request, 'admin/admin-dashboard/dashboard.html', context)
 
 def edit_leadership(request, pk):
     item = get_object_or_404(Leadership, pk=pk)
