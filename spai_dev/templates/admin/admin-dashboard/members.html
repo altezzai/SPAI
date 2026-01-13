@@ -169,11 +169,12 @@
   <div class="controls-container">
     <div class="filter-group">
       <button class="btn-filter active" onclick="setCategory('all', this)">All</button>
+      <button class="btn-filter" onclick="setCategory('fresher', this)">Fresher</button>
       <button class="btn-filter" onclick="setCategory('admin_not_approved', this)">Admin Pending</button>
       <button class="btn-filter" onclick="setCategory('president_not_approved', this)">President Pending</button>
       <button class="btn-filter" onclick="setCategory('secretary_not_approved', this)">Secretary Pending</button>
       <button class="btn-filter" onclick="setCategory('renew_subscription', this)">Renew Sub</button>
-      <button class="btn-filter" onclick="setCategory('subscribed', this)">Subscribed</button>
+      <button class="btn-filter" onclick="setCategory('active', this)">Active</button>
     </div>
 
     <div class="search-group">
@@ -190,6 +191,7 @@
           <th>Name</th>
           <th>Email / Username</th>
           <th>Current Status</th>
+          <th style="width: 120px;">Subscription</th>
         </tr>
       </thead>
       <tbody id="members-tbody">
@@ -203,7 +205,9 @@
                 data-admin="{{ u.admin_approved|yesno:'true,false' }}" 
                 data-president="{{ u.president_approval|yesno:'true,false' }}" 
                 data-secretary="{{ u.secretary_approval|yesno:'true,false' }}" 
-                data-annual="{{ u.annual_subscription|yesno:'true,false' }}">
+                data-annual="{{ u.annual_subscription|yesno:'true,false' }}"
+                data-substatus="{{ u.subscription_status }}"
+                data-subcount="{{ u.subscription_count }}">
               
               <td>#{{ u.id }}</td>
               <td>
@@ -220,31 +224,39 @@
                 <div style="font-size: 0.8em; color: var(--text-muted);">@{{ u.username }}</div>
               </td>
               <td>
-                {% if u.admin_approved and u.president_approval and u.secretary_approval and u.annual_subscription %}
-                    <span class="status-badge status-success">Active Member</span>
+                {% if not u.admin_approved %}
+                    <span class="status-badge status-danger">Waiting: Admin</span>
+                {% endif %}
+                
+                {% if not u.president_approval %}
+                    <span class="status-badge status-president">Waiting: President</span>
+                {% endif %}
+
+                {% if not u.secretary_approval %}
+                    <span class="status-badge status-secretary">Waiting: Secretary</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if u.subscription_status == 'Active' %}
+                    <span class="status-badge status-success">Active</span>
+                    {% if u.subscription_count %}
+                        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">({{ u.subscription_count }}x)</div>
+                    {% endif %}
+                {% elif u.subscription_status == 'Renew Subscription' %}
+                    <span class="status-badge status-info">Renew Sub</span>
+                {% elif u.subscription_status == 'Renewal Pending Approval' %}
+                  <span class="status-badge status-info">Paid, waiting for admin approval</span>
+                {% elif u.subscription_status == 'Not Active' %}
+                    <span class="status-badge" style="background: #f5f5f5; color: #757575; border: 1px solid #e0e0e0;">Not Active</span>
                 {% else %}
-                    {% if not u.admin_approved %}
-                        <span class="status-badge status-danger">Waiting: Admin</span>
-                    {% endif %}
-                    
-                    {% if not u.president_approval %}
-                        <span class="status-badge status-president">Waiting: President</span>
-                    {% endif %}
-
-                    {% if not u.secretary_approval %}
-                        <span class="status-badge status-secretary">Waiting: Secretary</span>
-                    {% endif %}
-
-                    {% if u.admin_approved and u.president_approval and u.secretary_approval and not u.annual_subscription %}
-                         <span class="status-badge status-info">Subscription Expired</span>
-                    {% endif %}
+                    <span class="status-badge" style="background: #f5f5f5; color: #757575; border: 1px solid #e0e0e0;">{{ u.subscription_status }}</span>
                 {% endif %}
               </td>
             </tr>
           {% endfor %}
         {% else %}
           <tr id="no-data-row">
-            <td colspan="4" style="text-align:center; padding: 30px; color: var(--text-muted);">
+            <td colspan="5" style="text-align:center; padding: 30px; color: var(--text-muted);">
               No members found in the database.
             </td>
           </tr>
@@ -303,7 +315,7 @@
       const isAdminApproved = row.dataset.admin === 'true';
       const isPresApproved = row.dataset.president === 'true';
       const isSecApproved = row.dataset.secretary === 'true';
-      const isSubscribed = row.dataset.annual === 'true';
+      const subStatus = (row.dataset.substatus || 'Not Active').trim();
       
       const name = (row.dataset.name || '').toLowerCase();
       const user = (row.dataset.username || '').toLowerCase();
@@ -314,6 +326,8 @@
       switch (currentCategory) {
         case 'all': 
           categoryMatch = true; break;
+        case 'fresher': 
+          categoryMatch = !isAdminApproved && !isPresApproved && !isSecApproved; break;
         case 'admin_not_approved': 
           categoryMatch = !isAdminApproved; break;
         case 'president_not_approved': 
@@ -321,9 +335,9 @@
         case 'secretary_not_approved': 
           categoryMatch = !isSecApproved; break;
         case 'renew_subscription':
-          categoryMatch = (isAdminApproved && isPresApproved && isSecApproved && !isSubscribed); break;
-        case 'subscribed':
-          categoryMatch = isSubscribed; break;
+          categoryMatch = (subStatus === 'Renew Subscription' || subStatus === 'Renewal Pending Approval'); break;
+        case 'active':
+          categoryMatch = subStatus === 'Active'; break;
         default: categoryMatch = true;
       }
 

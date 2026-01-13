@@ -733,6 +733,8 @@ def admin_approval(request, *args, **kwargs):
                 active=True
             )
             user.annual_subscription = True
+            user.subscription_status = "Active"
+            user.subscription_count = 1
             user.original_date_approved = datetime.now()
             annual_subscription.save()
             user.save()
@@ -1256,6 +1258,8 @@ def annual_sub_payment(request, *args, **kwargs):
             payment.save()
             if not models.AnnualSubscriptionModel.objects.filter(user=request.user).exists():
                 sub_obj = models.AnnualSubscriptionModel.objects.create(user=request.user, active=False)
+            request.user.subscription_status = "Renewal Pending Approval"
+            request.user.save()
             return redirect(
                 f"{reverse('success')}?message=Your Annual subscription payment done, your details are under validation. Thank you!")
         else:
@@ -1284,6 +1288,8 @@ def annual_sub_approval(request, *args, **kwargs):
     annual_model.end_date = original_date + timedelta(days=365)
     annual_model.active = True
     user.annual_subscription = True
+    user.subscription_status = "Active"
+    user.subscription_count = (user.subscription_count or 0) + 1
     annual_model.save()
     user.save()
     return redirect('individual_user_details', slug=slug)

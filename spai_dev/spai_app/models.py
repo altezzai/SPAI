@@ -164,6 +164,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     executive = models.PositiveSmallIntegerField(choices=settings.EXECUTIVE_CHOICES, blank=True, null=True)
     active_key = models.BooleanField(null=True, blank=True, default=False)
     annual_subscription = models.BooleanField(default=False)
+    subscription_status = models.CharField(max_length=30, default="Not Active", null=True, blank=True)
+    subscription_count = models.IntegerField(default=0, null=True, blank=True)
     secretary_approval = models.BooleanField(default=False)
     president_approval = models.BooleanField(default=False)
 

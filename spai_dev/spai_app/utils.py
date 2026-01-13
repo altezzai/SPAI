@@ -109,7 +109,9 @@ def update_subscription_status(request, bulk):
     if bulk:
         subscriptions = AnnualSubscriptionModel.objects.filter(end_date__lt=current_date)
         for sub in subscriptions:
+            
             sub.user.annual_subscription = False
+            sub.user.subscription_status = "Renew Subscription"
             sub.active = False
             sub.save()
             sub.user.save()
@@ -117,6 +119,7 @@ def update_subscription_status(request, bulk):
         sub = AnnualSubscriptionModel.objects.filter(end_date__lt=current_date, user=request.user).first()
         if sub is not None:
             sub.user.annual_subscription = False
+            sub.user.subscription_status = "Renew Subscription"
             sub.active = False
             sub.save()
             sub.user.save()

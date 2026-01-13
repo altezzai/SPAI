@@ -37,7 +37,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['email', 'username', 'first_name', 'last_name', 'state', 'annual_subscription',
                   'status', 'user_role', 'reg_no', 'admin_approved', 'date_approved', 'approval_percentage',
-                  'active_key', 'original_date_approved']
+                  'active_key', 'original_date_approved', 'subscription_status', 'subscription_count']
 
     def create(self, validated_data):
         validated_data['status'] = settings.ADMIN_APPROVED

@@ -1,139 +1,127 @@
 {% extends 'main.html' %}
 {% load static %}
 {% block header %}
-{% include 'header.html' %}
+  {% include 'header.html' %}
 {% endblock %}
 {% block content %}
-<div class="grid-container">
+  <div class="grid-container">
     <div class="reg-form-section">
-        <p class="user-profile-header">User Profile</p>
-        <form id="user-details-form" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <!-- Step 1: First name and last name -->
-            <div id="step-1" class="step active animated-list2">
-                <p>Step 2</p>
-                <div class="degree-section">
-                    <label for="degree">Degree <span class="required-star">*</span></label>
-                    <input class="user-profile" type="text" placeholder="Degree" id="degree" name="degree"
-                           required>
-                </div>
-                <div class="profession-section">
-                    <label for="profession">Profession <span class="required-star">*</span></label>
-                    <input class="user-profile" type="text" placeholder="Profession" id="profession" name="profession"
-                           required>
-                </div>
-                <div class="institution-section">
-                    <label for="institution">Institution <span class="required-star">*</span></label>
-                    <input class="user-profile" type="text" placeholder="Institution" id="institution"
-                           name="institution"
-                           required>
-                </div>
-                <div class="department-section">
-                    <label for="department">Department <span class="required-star">*</span></label>
-                    <input class="user-profile" type="text" placeholder="Department" id="department" name="department"
-                           required>
-                </div>
-                <div class="address-section">
-                    <label>Address <span class="required-star">*</span></label>
-                    <input class="user-profile address-input" type="text" placeholder="House name" id="house_name"
-                           name="house_name"
-                           required>
-                    <input class="user-profile address-input" type="text" placeholder="Street name" id="street_name"
-                           name="street_name"
-                           required>
-                    <input class="user-profile address-input" type="text" placeholder="City name" id="city_name"
-                           name="city_name"
-                           required>
-                    <input class="user-profile address-input" type="number" placeholder="Pin code" id="pin" name="pin"
-                           required>
-                </div>
-                <!--                <div class="loading-index">-->
-                <!--                    <img src="{% static 'image/line_blue.png' %}" alt="50%">-->
-                <!--                    <img src="{% static 'image/line_blue.png' %}" alt="50%">-->
-                <!--                    <img src="{% static 'image/line_white.png' %}" alt="50%">-->
-                <!--                </div>-->
-                <div class="btn-grp-1">
-                    <button id="next-btn" type="button" onclick="showNextStep()">Next</button>
-                </div>
-            </div>
+      <p class="user-profile-header">User Profile</p>
+      <form id="user-details-form" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <!-- Step 1: First name and last name -->
+        <div id="step-1" class="step active animated-list2">
+          <p>Step 2</p>
+          <div class="degree-section">
+            <label for="degree">Degree <span class="required-star">*</span></label>
+            <input class="user-profile" type="text" placeholder="Degree" id="degree" name="degree" required />
+          </div>
+          <div class="profession-section">
+            <label for="profession">Profession <span class="required-star">*</span></label>
+            <input class="user-profile" type="text" placeholder="Profession" id="profession" name="profession" required />
+          </div>
+          <div class="institution-section">
+            <label for="institution">Institution <span class="required-star">*</span></label>
+            <input class="user-profile" type="text" placeholder="Institution" id="institution" name="institution" required />
+          </div>
+          <div class="department-section">
+            <label for="department">Department <span class="required-star">*</span></label>
+            <input class="user-profile" type="text" placeholder="Department" id="department" name="department" required />
+          </div>
+          <div class="address-section">
+            <label>Address <span class="required-star">*</span></label>
+            <input class="user-profile address-input" type="text" placeholder="House name" id="house_name" name="house_name" required />
+            <input class="user-profile address-input" type="text" placeholder="Street name" id="street_name" name="street_name" required />
+            <input class="user-profile address-input" type="text" placeholder="City name" id="city_name" name="city_name" required />
+            <input class="user-profile address-input" type="number" placeholder="Pin code" id="pin" name="pin" required />
+          </div>
+          <!-- <div class="loading-index"> -->
+          <!-- <img src="{% static 'image/line_blue.png' %}" alt="50%"> -->
+          <!-- <img src="{% static 'image/line_blue.png' %}" alt="50%"> -->
+          <!-- <img src="{% static 'image/line_white.png' %}" alt="50%"> -->
+          <!-- </div> -->
+          <div class="btn-grp-1">
+            <button id="next-btn" type="button" onclick="showNextStep()">Next</button>
+          </div>
+        </div>
 
-            <!-- Step 2: Pin code, house name, and street name -->
-            <div id="step-2" class="step" style="display: none;">
-                <p>Step 3</p>
-                <div class="photo-section">
-                    <label for="photo">Photo <span class="required-star">*</span></label>
-                    <input class="user-profile" type="file" accept="image/*" placeholder="Select your photo" id="photo"
-                           name="photo"
-                           required>
-                    <!--                    <img src="{% static 'image/profile.png' %}" alt="profile" class="profile-icon">-->
-                </div>
-                <div class="non-photo-upload">
-                    <div class="phone-section">
-                        <label for="phone">Phone number <span class="required-star">*</span></label>
-                        <input class="user-profile" type="number" placeholder="Phone number" id="phone"
-                               name="phone_number"
-                               required>
-                    </div>
-                    <div class="phone-section">
-                        <label for="alt-phone">Alternate phone number</label>
-                        <input class="user-profile" type="number" placeholder="Alternate phone number" id="alt-phone"
-                               name="alternate_number">
-                    </div>
-                    <div class="email-section">
-                        <label for="alternate_mail">Alternate email</label>
-                        <input class="user-profile" type="email" placeholder="Alternate email" id="alternate_mail"
-                               name="alternate_mail">
-                    </div>
-                    <div class="specialized-section">
-                        <label for="specialized_in">Specialized in <span class="required-star">*</span></label>
-                        <input class="user-profile" type="text" placeholder="Specialized in" id="specialized_in"
-                               name="specialized_in"
-                               required>
-                    </div>
-                    <div class="research-section">
-                        <label for="research_interest">Research interest <span class="required-star">*</span></label>
-                        <input class="user-profile" type="text" placeholder="Research interest" id="research_interest"
-                               name="research_interest"
-                               required>
-                    </div>
-                    <!--                    <div class="loading-index">-->
-                    <!--                        <img src="{% static 'image/line_blue.png' %}" alt="50%">-->
-                    <!--                        <img src="{% static 'image/line_blue.png' %}" alt="50%">-->
-                    <!--                        <img src="{% static 'image/line_blue.png' %}" alt="50%">-->
-                    <!--                    </div>-->
-                    <div class="btn-grp-2">
-                        <button class="step2-btn" id="prev-btn" type="button" onclick="showPrevStep()">Previous</button>
-                        <button id="submit-btn" class="step2-btn" type="submit">Submit</button>
-                    </div>
-                </div>
+        <!-- Step 2: Pin code, house name, and street name -->
+        <div id="step-2" class="step" style="display: none;">
+          <p>Step 3</p>
+          <div class="photo-section">
+            <label for="photo">Photo <span class="required-star">*</span></label>
+            <input class="user-profile" type="file" accept="image/*" placeholder="Select your photo" id="photo" name="photo" required />
+            <!-- <img src="{% static 'image/profile.png' %}" alt="profile" class="profile-icon"> -->
+          </div>
+          <div class="non-photo-upload">
+            <div class="phone-section">
+              <label for="phone">Phone number <span class="required-star">*</span></label>
+              <input class="user-profile" type="number" placeholder="Phone number" id="phone" name="phone_number" required />
             </div>
-        </form>
-
+            <div class="phone-section">
+              <label for="alt-phone">Alternate phone number</label>
+              <input class="user-profile" type="number" placeholder="Alternate phone number" id="alt-phone" name="alternate_number" />
+            </div>
+            <div class="email-section">
+              <label for="alternate_mail">Alternate email</label>
+              <input class="user-profile" type="email" placeholder="Alternate email" id="alternate_mail" name="alternate_mail" />
+            </div>
+            <div class="specialized-section">
+              <label for="specialized_in">Specialized in <span class="required-star">*</span></label>
+              <input class="user-profile" type="text" placeholder="Specialized in" id="specialized_in" name="specialized_in" required />
+            </div>
+            <div class="research-section">
+              <label for="research_interest">Research interest <span class="required-star">*</span></label>
+              <input class="user-profile" type="text" placeholder="Research interest" id="research_interest" name="research_interest" required />
+            </div>
+            <!-- <div class="loading-index"> -->
+            <!-- <img src="{% static 'image/line_blue.png' %}" alt="50%"> -->
+            <!-- <img src="{% static 'image/line_blue.png' %}" alt="50%"> -->
+            <!-- <img src="{% static 'image/line_blue.png' %}" alt="50%"> -->
+            <!-- </div> -->
+            <div class="btn-grp-2">
+              <button class="step2-btn" id="prev-btn" type="button" onclick="showPrevStep()">Previous</button>
+              <button id="submit-btn" class="step2-btn" type="submit">Submit</button>
+            </div>
+          </div>
+        </div>
+      </form>
     </div>
     <div class="image-section-2">
-        <img src="{% static 'image/Frame_2.png' %}" alt="Login Image">
+      <img src="{% static 'image/Frame_2.png' %}" alt="Login Image" />
     </div>
-</div>
-<script type="text/javascript">
+  </div>
+  <script type="text/javascript">
     document.addEventListener('DOMContentLoaded', function () {
-        document.querySelector('.menu-icon').addEventListener('click', function () {
-            document.querySelector('.navbar').classList.toggle('active');
-        });
-    });
-</script>
+      document.querySelector('.menu-icon').addEventListener('click', function () {
+        document.querySelector('.navbar').classList.toggle('active')
+      })
+    })
+  </script>
 {% endblock %}
 {% block footer %}
-{% include 'footer.html' %}
-<script>
+  {% include 'footer.html' %}
+  <script>
     function showNextStep() {
-   document.getElementById('step-1').style.display = 'none';
-   document.getElementById('step-2').style.display = 'block';
- }
-
- function showPrevStep() {
-   document.getElementById('step-2').style.display = 'none';
-   document.getElementById('step-1').style.display = 'block';
- }
-
-</script>
+      const step1 = document.getElementById('step-1')
+      const requiredFields = step1.querySelectorAll('[required]')
+    
+      for (const field of requiredFields) {
+        const value = typeof field.value === 'string' ? field.value.trim() : ''
+    
+        if (!value || !field.checkValidity()) {
+          field.reportValidity()
+          return
+        }
+      }
+    
+      step1.style.display = 'none'
+      document.getElementById('step-2').style.display = 'block'
+    }
+    
+    function showPrevStep() {
+      document.getElementById('step-2').style.display = 'none'
+      document.getElementById('step-1').style.display = 'block'
+    }
+  </script>
 {% endblock %}
