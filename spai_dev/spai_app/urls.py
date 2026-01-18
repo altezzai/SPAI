@@ -86,5 +86,9 @@ urlpatterns = [
     path('api/create/<str:type>/', views.api_create, name='api_create'),
     path('api/update/<str:type>/<int:pk>/', views.api_update, name='api_update'),
     path('api/delete/<str:type>/<int:pk>/', views.api_delete, name='api_delete'),
+    # Subscription payment verification API
+    path('manage-dashboard/subscription/user/<int:user_id>/', views.subscription_verification_detail, name='subscription_verification_detail'),
+    path('api/subscription/user/<int:user_id>/details/', views.api_subscription_user_details, name='api_subscription_user_details'),
+    path('api/subscription/user/<int:user_id>/approve/', views.api_subscription_user_approve, name='api_subscription_user_approve'),
     # path('edit/internship/<int:pk>/', views.edit_internship, name='edit_internship'),
 ]

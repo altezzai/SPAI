@@ -1,300 +1,484 @@
 {% extends 'main.html' %}
 {% load static %}
 {% block cssfiles %}
-<link rel="stylesheet" href="{% static 'css/sub/header.css' %}">
-<link rel="stylesheet" href="{% static 'css/sub/footer.css' %}">
-<link rel="stylesheet" href="{% static 'css/sub/members.css' %}">
-<link rel="stylesheet" href="{% static 'css/sub/paginator.css' %}">
+  <link rel="stylesheet" href="{% static 'css/sub/header.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/sub/footer.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/sub/members.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/sub/paginator.css' %}" />
 {% endblock %}
 
 {% block header %}
-{% include 'header.html' %}
+  {% include 'header.html' %}
 {% endblock %}
 
 {% block content %}
-<style>
+  <style>
     th {
-        cursor: pointer;
+      cursor: pointer;
     }
     .sort-icon {
-        font-size: 0.8em;
-        margin-left: 5px;
+      font-size: 0.8em;
+      margin-left: 5px;
     }
-</style>
-<div class="life-h">
+  </style>
+  <div class="life-h">
     <h1>life members</h1>
     <form class="search-wrapper" style="margin-bottom:15px;" method="get" action="{% url 'search_lm' %}">
-        <input type="text" name="query" class="search-input" placeholder="search life members..."
-               value="{{ query }}">
-        <button type="submit" class="search-button">
-            <img src="{% static 'image/search.svg' %}" alt="Search">
-        </button>
+      <input type="text" name="query" class="search-input" placeholder="search life members..." value="{{ query }}" />
+      <button type="submit" class="search-button"><img src="{% static 'image/search.svg' %}" alt="Search" /></button>
     </form>
     {% if request.user.user_role == 1 or request.user.executive == 1 or request.user.executive == 2 %}
-    <div class="refresh-btn">
+      <div class="refresh-btn">
         <a href="{% url 'refresh_members' %}">Refresh</a>
-    </div>
+      </div>
     {% endif %}
-</div>
-<div class="news-tabs">
+  </div>
+  <div class="news-tabs">
     <ul class="tab-list">
-        <li class="tab-item active" data-tab="new">New</li>
-        <li class="tab-item" data-tab="life">Life Members</li>
-        <li class="tab-item" data-tab="active-m">Active</li>
-        <li class="tab-item" data-tab="non-active">Non-active</li>
+      <li class="tab-item active" data-tab="new">New</li>
+      <li class="tab-item" data-tab="life">Life Members</li>
+      <li class="tab-item" data-tab="active-m">Active</li>
+      <li class="tab-item" data-tab="non-active">Non-active</li>
     </ul>
-</div>
-<!-- <div class="tabs">
+  </div>
+  <!--      <div class="tabs">
     <div class="tab" data-tab="new">New Members</div>
     <div class="tab" data-tab="life">Life Members</div>
-</div> -->
+</div>      -->
 
-<table class="table active" id="new">
+  <table class="table active" id="new">
     <thead>
-    <tr>
-        <th onclick="sortTable('new', 0);">Registration No <span class="sort-icon">&#9650;&#9660;</span></th>
-        <th onclick="sortTable('new',1)">Username<span class="sort-icon">&#9650;&#9660;</span></th>
+      <tr>
+        <th onclick="sortTable('new', 0);">
+          Registration No <span class="sort-icon">&#9650;&#9660;</span>
+        </th>
+        <th onclick="sortTable('new',1)">
+          Username<span class="sort-icon">&#9650;&#9660;</span>
+        </th>
         <th class="email">Email</th>
-        <th onclick="sortTable('new',3)">First Name <span class="sort-icon">&#9650;&#9660;</span></th>
-        <th onclick="sortTable('new',4)">Register Date <span class="sort-icon">&#9650;&#9660;</span></th>
+        <th onclick="sortTable('new',3)">
+          First Name <span class="sort-icon">&#9650;&#9660;</span>
+        </th>
+        <th onclick="sortTable('new',4)">
+          Register Date <span class="sort-icon">&#9650;&#9660;</span>
+        </th>
         <th class="status">Status</th>
         <th>Actions</th>
-    </tr>
+      </tr>
     </thead>
     <tbody>
-    {% for user in new_members %}
-    <tr>
-        <td>{{ user.reg_no }}</td>
-        <td class="username">
+      {% for user in new_members %}
+        <tr>
+          <td>{{ user.reg_no }}</td>
+          <td class="username">
             {% if user.photo %}
-            <img src="{{ user.photo.url }}" alt="">
+              <img src="{{ user.photo.url }}" alt="" />
             {% else %}
-            <img src="{% static 'image/profile-icon.svg' %}" alt="photo">
+              <img src="{% static 'image/profile-icon.svg' %}" alt="photo" />
             {% endif %}
             {{ user.username }}
-        </td>
-        <td class="email">{{ user.email }}</td>
-        <td>{{ user.first_name }} {{ user.last_name }}</td>
-        <td>{{ user.date_created }}</td>
-        <td class="status">{{ user.next_step }}</td>
-        <td>
+          </td>
+          <td class="email">{{ user.email }}</td>
+          <td>{{ user.first_name }} {{ user.last_name }}</td>
+          <td>{{ user.date_created }}</td>
+          <td class="status">{{ user.next_step }}</td>
+          <td>
             <a href="{% url 'individual_user_details' user.slug_value %}">
-                <div class="view">
-                    <img src="{% static 'image/eye.svg' %}" alt="">
-                    <p>View</p>
-                </div>
+              <div class="view">
+                <img src="{% static 'image/eye.svg' %}" alt="" />
+                <p>View</p>
+              </div>
             </a>
-        </td>
-    </tr>
-    {% endfor %}
+          </td>
+        </tr>
+      {% endfor %}
     </tbody>
-</table>
-<table class="table" id="life">
-    <thead>
-    <tr>
-        <th onclick="sortTable('life',0)">Registration No<span class="sort-icon">&#9650;&#9660;</span></th>
-        <th onclick="sortTable('life',1)">Name <span class="sort-icon">&#9650;&#9660;</span></th>
-        <th class="email">Email</th>
-        <th onclick="sortTable('life',3)">Membership Date<span class="sort-icon">&#9650;&#9660;</span></th>
-        <th class="status">Active</th>
-        <th>Action</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for user in life_members %}
-    <tr>
-        <td>{{user.reg_no}}</td>
-        <td class="username">
-            {{user.name}}
-        </td>
-        <td class="email">{{user.email}}</td>
-        <td>{{user.membership_date}}</td>
-        <td class="status">{{user.active}}</td>
-        <td>
-            <a href="{% url 'life_member_info' user.uid %}">
-                <div class="view">
-                    <img src="{% static 'image/eye.svg' %}" alt="">
-                    <p>View</p>
-                </div>
-            </a>
-        </td>
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
+  </table>
 
-<div id="life-members-paginator" class="pagination" style="display: none;">
+  <div id="new-members-paginator" class="pagination" style="display: none;">
     <ul>
-        {% if life_members.has_previous %}
-        <li><a href="?page=1&active_tab=life">First</a></li>
-        <li><a href="?page={{ life_members.previous_page_number }}&active_tab=life">Previous</a></li>
-        {% else %}
+      {% if new_members.has_previous %}
+        <li>
+          <a href="?page_new=1&active_tab=new">First</a>
+        </li>
+        <li>
+          <a href="?page_new={{ new_members.previous_page_number }}&active_tab=new">Previous</a>
+        </li>
+      {% else %}
         <li class="disabled">First</li>
         <li class="disabled">Previous</li>
-        {% endif %}
+      {% endif %}
 
-        {% with life_members.number as current_page %}
-        {% with current_page|add:-1 as start_page %}
-        {% for num in life_members.paginator.page_range %}
-        {% if num >= start_page and num < start_page|add:3 %}
-        {% if num == life_members.number %}
-        <li class="active"><span>{{ num }}</span></li>
-        {% else %}
-        <li><a href="?page={{ num }}&active_tab=life">{{ num }}</a></li>
-        {% endif %}
-        {% endif %}
-        {% endfor %}
+      {% with current_page=new_members.number %}
+        {% with start_page=current_page|add:'-1' %}
+          {% for num in new_members.paginator.page_range %}
+            {% if num >= start_page and num < start_page|add:'3' %}
+              {% if num == new_members.number %}
+                <li class="active">
+                  <span>{{ num }}</span>
+                </li>
+              {% else %}
+                <li>
+                  <a href="?page_new={{ num }}&active_tab=new">{{ num }}</a>
+                </li>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
         {% endwith %}
-        {% endwith %}
+      {% endwith %}
 
-        {% if life_members.has_next %}
-        <li><a href="?page={{ life_members.next_page_number }}&active_tab=life">Next</a></li>
-        <li><a href="?page={{ life_members.paginator.num_pages }}&active_tab=life">Last</a></li>
-        {% else %}
+      {% if new_members.has_next %}
+        <li>
+          <a href="?page_new={{ new_members.next_page_number }}&active_tab=new">Next</a>
+        </li>
+        <li>
+          <a href="?page_new={{ new_members.paginator.num_pages }}&active_tab=new">Last</a>
+        </li>
+      {% else %}
         <li class="disabled">Next</li>
         <li class="disabled">Last</li>
-        {% endif %}
+      {% endif %}
     </ul>
-</div>
-
-
-<table class="table" id="active-m">
+  </div>
+  <table class="table" id="life">
     <thead>
-    <tr>
-        <th onclick="sortTable('active-m',0)">Registration No <span class="sort-icon">&#9650;&#9660;</span></th>
-        <th onclick="sortTable('active-m',1)">Username <span class="sort-icon">&#9650;&#9660;</span></th>
+      <tr>
+        <th onclick="sortTable('life',0)">
+          Registration No<span class="sort-icon">&#9650;&#9660;</span>
+        </th>
+        <th onclick="sortTable('life',1)">
+          Name <span class="sort-icon">&#9650;&#9660;</span>
+        </th>
+        <th class="email">Email</th>
+        <th onclick="sortTable('life',3)">
+          Membership Date<span class="sort-icon">&#9650;&#9660;</span>
+        </th>
+        <th class="status">Active</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in life_members %}
+        <tr>
+          <td>{{ user.reg_no }}</td>
+          <td class="username">{{ user.name }}</td>
+          <td class="email">{{ user.email }}</td>
+          <td>{{ user.membership_date }}</td>
+          <td class="status">{{ user.active }}</td>
+          <td>
+            <a href="{% url 'life_member_info' user.uid %}">
+              <div class="view">
+                <img src="{% static 'image/eye.svg' %}" alt="" />
+                <p>View</p>
+              </div>
+            </a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div id="life-members-paginator" class="pagination" style="display: none;">
+    <ul>
+      {% if life_members.has_previous %}
+        <li>
+          <a href="?page_life=1&active_tab=life">First</a>
+        </li>
+        <li>
+          <a href="?page_life={{ life_members.previous_page_number }}&active_tab=life">Previous</a>
+        </li>
+      {% else %}
+        <li class="disabled">First</li>
+        <li class="disabled">Previous</li>
+      {% endif %}
+
+      {% with current_page=life_members.number %}
+        {% with start_page=current_page|add:'-1' %}
+          {% for num in life_members.paginator.page_range %}
+            {% if num >= start_page and num < start_page|add:'3' %}
+              {% if num == life_members.number %}
+                <li class="active">
+                  <span>{{ num }}</span>
+                </li>
+              {% else %}
+                <li>
+                  <a href="?page_life={{ num }}&active_tab=life">{{ num }}</a>
+                </li>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        {% endwith %}
+      {% endwith %}
+
+      {% if life_members.has_next %}
+        <li>
+          <a href="?page_life={{ life_members.next_page_number }}&active_tab=life">Next</a>
+        </li>
+        <li>
+          <a href="?page_life={{ life_members.paginator.num_pages }}&active_tab=life">Last</a>
+        </li>
+      {% else %}
+        <li class="disabled">Next</li>
+        <li class="disabled">Last</li>
+      {% endif %}
+    </ul>
+  </div>
+
+  <table class="table" id="active-m">
+    <thead>
+      <tr>
+        <th onclick="sortTable('active-m',0)">
+          Registration No <span class="sort-icon">&#9650;&#9660;</span>
+        </th>
+        <th onclick="sortTable('active-m',1)">
+          Username <span class="sort-icon">&#9650;&#9660;</span>
+        </th>
         <th class="email">Email</th>
         <th onclick="sortTable('active-m',3)">First Name</th>
-        <th onclick="sortTable('active-m',4)">Register Date <span class="sort-icon">&#9650;&#9660;</span></th>
+        <th onclick="sortTable('active-m',4)">
+          Register Date <span class="sort-icon">&#9650;&#9660;</span>
+        </th>
         <th class="status">Status</th>
         <th>Actions</th>
-    </tr>
+      </tr>
     </thead>
     <tbody>
-
-    {% for user in active%}
-    <tr>
-        <td>{{user.reg_no}}</td>
-        <td class="username">
+      {% for user in active %}
+        <tr>
+          <td>{{ user.reg_no }}</td>
+          <td class="username">
             {% if user.photo %}
-            <img src="{{ user.photo.url }}" alt="">
+              <img src="{{ user.photo.url }}" alt="" />
             {% else %}
-            <img src="{% static 'image/profile-icon.svg' %}" alt="photo">
+              <img src="{% static 'image/profile-icon.svg' %}" alt="photo" />
             {% endif %}
-            {{user.username}}
-        </td>
-        <td class="email">{{user.email}}</td>
-        <td>{{user.first_name}} {{user.last_name}}</td>
-        <td>{{user.date_created}}</td>
-        <td class="status">{{user.next_step}}</td>
-        <td>
+            {{ user.username }}
+          </td>
+          <td class="email">{{ user.email }}</td>
+          <td>{{ user.first_name }} {{ user.last_name }}</td>
+          <td>{{ user.date_created }}</td>
+          <td class="status">{{ user.next_step }}</td>
+          <td>
             <a href="{% url 'individual_user_details' user.slug_value %}">
-                <div class="view">
-                    <img src="{% static 'image/eye.svg' %}" alt="">
-                    <p>View</p>
-                </div>
+              <div class="view">
+                <img src="{% static 'image/eye.svg' %}" alt="" />
+                <p>View</p>
+              </div>
             </a>
-        </td>
-    </tr>
-    {% endfor %}
+          </td>
+        </tr>
+      {% endfor %}
     </tbody>
-</table>
-<table class="table" id="non-active">
+  </table>
+
+  <div id="active-members-paginator" class="pagination" style="display: none;">
+    <ul>
+      {% if active.has_previous %}
+        <li>
+          <a href="?page_active=1&active_tab=active-m">First</a>
+        </li>
+        <li>
+          <a href="?page_active={{ active.previous_page_number }}&active_tab=active-m">Previous</a>
+        </li>
+      {% else %}
+        <li class="disabled">First</li>
+        <li class="disabled">Previous</li>
+      {% endif %}
+
+      {% with current_page=active.number %}
+        {% with start_page=current_page|add:'-1' %}
+          {% for num in active.paginator.page_range %}
+            {% if num >= start_page and num < start_page|add:'3' %}
+              {% if num == active.number %}
+                <li class="active">
+                  <span>{{ num }}</span>
+                </li>
+              {% else %}
+                <li>
+                  <a href="?page_active={{ num }}&active_tab=active-m">{{ num }}</a>
+                </li>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        {% endwith %}
+      {% endwith %}
+
+      {% if active.has_next %}
+        <li>
+          <a href="?page_active={{ active.next_page_number }}&active_tab=active-m">Next</a>
+        </li>
+        <li>
+          <a href="?page_active={{ active.paginator.num_pages }}&active_tab=active-m">Last</a>
+        </li>
+      {% else %}
+        <li class="disabled">Next</li>
+        <li class="disabled">Last</li>
+      {% endif %}
+    </ul>
+  </div>
+  <table class="table" id="non-active">
     <thead>
-    <tr>
-        <th onclick="sortTable('non-active',0)">Registration No <span class="sort-icon">&#9650;&#9660;</span></th>
-        <th onclick="sortTable('non-active',1)">Username <span class="sort-icon">&#9650;&#9660;</span></th>
+      <tr>
+        <th onclick="sortTable('non-active',0)">
+          Registration No <span class="sort-icon">&#9650;&#9660;</span>
+        </th>
+        <th onclick="sortTable('non-active',1)">
+          Username <span class="sort-icon">&#9650;&#9660;</span>
+        </th>
         <th class="email">Email</th>
         <th onclick="sortTable('non-active',3)">First Name</th>
-        <th onclick="sortTable('non-active',4)">Register Date <span class="sort-icon">&#9650;&#9660;</span></th>
+        <th onclick="sortTable('non-active',4)">
+          Register Date <span class="sort-icon">&#9650;&#9660;</span>
+        </th>
         <th class="status">Status</th>
         <th>Actions</th>
-    </tr>
+      </tr>
     </thead>
     <tbody>
-
-    {% for user in non_active%}
-    <tr>
-        <td>{{user.reg_no}}</td>
-        <td class="username">
+      {% for user in non_active %}
+        <tr>
+          <td>{{ user.reg_no }}</td>
+          <td class="username">
             {% if user.photo %}
-            <img src="{{ user.photo.url }}" alt="">
+              <img src="{{ user.photo.url }}" alt="" />
             {% else %}
-            <img src="{% static 'image/profile-icon.svg' %}" alt="photo">
+              <img src="{% static 'image/profile-icon.svg' %}" alt="photo" />
             {% endif %}
-            {{user.username}}
-        </td>
-        <td class="email">{{user.email}}</td>
-        <td>{{user.first_name}} {{user.last_name}}</td>
-        <td>{{user.date_created}}</td>
-        <td class="status">{{user.next_step}}</td>
-        <td>
+            {{ user.username }}
+          </td>
+          <td class="email">{{ user.email }}</td>
+          <td>{{ user.first_name }} {{ user.last_name }}</td>
+          <td>{{ user.date_created }}</td>
+          <td class="status">{{ user.next_step }}</td>
+          <td>
             <a href="{% url 'individual_user_details' user.slug_value %}">
-                <div class="view">
-                    <img src="{% static 'image/eye.svg' %}" alt="">
-                    <p>View</p>
-                </div>
+              <div class="view">
+                <img src="{% static 'image/eye.svg' %}" alt="" />
+                <p>View</p>
+              </div>
             </a>
-        </td>
-    </tr>
-    {% endfor %}
+          </td>
+        </tr>
+      {% endfor %}
     </tbody>
-</table>
-{% endblock %}
+  </table>
 
+  <div id="non-active-members-paginator" class="pagination" style="display: none;">
+    <ul>
+      {% if non_active.has_previous %}
+        <li>
+          <a href="?page_non_active=1&active_tab=non-active">First</a>
+        </li>
+        <li>
+          <a href="?page_non_active={{ non_active.previous_page_number }}&active_tab=non-active">Previous</a>
+        </li>
+      {% else %}
+        <li class="disabled">First</li>
+        <li class="disabled">Previous</li>
+      {% endif %}
+
+      {% with current_page=non_active.number %}
+        {% with start_page=current_page|add:'-1' %}
+          {% for num in non_active.paginator.page_range %}
+            {% if num >= start_page and num < start_page|add:'3' %}
+              {% if num == non_active.number %}
+                <li class="active">
+                  <span>{{ num }}</span>
+                </li>
+              {% else %}
+                <li>
+                  <a href="?page_non_active={{ num }}&active_tab=non-active">{{ num }}</a>
+                </li>
+              {% endif %}
+            {% endif %}
+          {% endfor %}
+        {% endwith %}
+      {% endwith %}
+
+      {% if non_active.has_next %}
+        <li>
+          <a href="?page_non_active={{ non_active.next_page_number }}&active_tab=non-active">Next</a>
+        </li>
+        <li>
+          <a href="?page_non_active={{ non_active.paginator.num_pages }}&active_tab=non-active">Last</a>
+        </li>
+      {% else %}
+        <li class="disabled">Next</li>
+        <li class="disabled">Last</li>
+      {% endif %}
+    </ul>
+  </div>
+{% endblock %}
 
 {% block footer %}
-{% include 'footer.html' %}
+  {% include 'footer.html' %}
 {% endblock %}
 {% block jsfile %}
-<script type="text/javascript" src="{% static 'js\sub\life_members.js' %}"></script>
-<script>
+  <script type="text/javascript" src="{% static 'js\sub\life_members.js' %}"></script>
+  <script>
     document.addEventListener('DOMContentLoaded', function () {
-    const tabs = document.querySelectorAll('.tab-item');
-    const tables = document.querySelectorAll('.table');
-    const paginator = document.getElementById('life-members-paginator'); // Ensure this matches the ID in your paginator div
-
-    // Function to set active tab based on URL parameter
-    function setActiveTab() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const activeTab = urlParams.get('active_tab') || 'new'; // Default to 'new' if no param is found
-
+      const tabs = document.querySelectorAll('.tab-item')
+      const tables = document.querySelectorAll('.table')
+      const paginators = {
+        new: document.getElementById('new-members-paginator'),
+        life: document.getElementById('life-members-paginator'),
+        'active-m': document.getElementById('active-members-paginator'),
+        'non-active': document.getElementById('non-active-members-paginator')
+      }
+    
+      function hideAllPaginators() {
+        Object.values(paginators).forEach((p) => {
+          if (p) p.style.display = 'none'
+        })
+      }
+    
+      function showPaginatorFor(tabId) {
+        hideAllPaginators()
+        const paginator = paginators[tabId]
+        if (paginator) paginator.style.display = 'block'
+      }
+    
+      // Function to set active tab based on URL parameter
+      function setActiveTab() {
+        const urlParams = new URLSearchParams(window.location.search)
+        const activeTab = urlParams.get('active_tab') || 'new' // Default to 'new' if no param is found
+    
         // Show corresponding table
-        tabs.forEach(tab => {
-            if (tab.getAttribute('data-tab') === activeTab) {
-                tab.classList.add('active');
-                document.getElementById(activeTab).classList.add('active');
-                paginator.style.display = activeTab === 'life' ? 'block' : 'none'; // Show paginator for 'life'
-            } else {
-                tab.classList.remove('active');
-                document.getElementById(tab.getAttribute('data-tab')).classList.remove('active');
-            }
-        });
-    }
-
-    setActiveTab(); // Set the active tab on load
-
-    // Add click event to each tab
-    tabs.forEach(tab => {
+        tabs.forEach((tab) => {
+          if (tab.getAttribute('data-tab') === activeTab) {
+            tab.classList.add('active')
+            document.getElementById(activeTab).classList.add('active')
+            showPaginatorFor(activeTab)
+          } else {
+            tab.classList.remove('active')
+            document.getElementById(tab.getAttribute('data-tab')).classList.remove('active')
+          }
+        })
+      }
+    
+      setActiveTab() // Set the active tab on load
+    
+      // Add click event to each tab
+      tabs.forEach((tab) => {
         tab.addEventListener('click', function () {
-            // Update active tab
-            tabs.forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-            const activeTab = this.getAttribute('data-tab');
-
-            // Show corresponding table
-            tables.forEach(table => {
-                if (table.id === activeTab) {
-                    table.classList.add('active');
-                } else {
-                    table.classList.remove('active');
-                }
-            });
-
-            // Show paginator only for the 'life' tab
-            paginator.style.display = activeTab === 'life' ? 'block' : 'none';
-        });
-    });
-});
-</script>
+          // Update active tab
+          tabs.forEach((t) => t.classList.remove('active'))
+          this.classList.add('active')
+          const activeTab = this.getAttribute('data-tab')
+    
+          // Show corresponding table
+          tables.forEach((table) => {
+            if (table.id === activeTab) {
+              table.classList.add('active')
+            } else {
+              table.classList.remove('active')
+            }
+          })
+    
+          // Show paginator only for the active tab
+          showPaginatorFor(activeTab)
+        })
+      })
+    })
+  </script>
 {% endblock %}

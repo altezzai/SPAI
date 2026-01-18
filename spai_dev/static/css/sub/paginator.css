@@ -1,15 +1,25 @@
-#life-members-paginator {
-    display: flex;               
-    justify-content: center;     
-    margin: 20px auto;          
-    width: fit-content;         
+/* Pagination container (used by all tabs) */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 20px auto;
 }
 
 .pagination ul {
-    list-style: none;            /* Remove bullet points */
-    padding: 0;                  /* Remove padding */
-    display: flex;               /* Arrange items horizontally */
-    gap: 10px;                /* Add space between items */
+    list-style: none;
+    /* Remove bullet points */
+    padding: 0;
+    /* Remove padding */
+    display: flex;
+    /* Arrange items horizontally */
+    gap: 10px;
+    /* Add space between items */
+    flex-wrap: wrap;
+    /* Wrap on smaller screens */
+    justify-content: center;
+    margin: 0;
 }
 
 .pagination li {
@@ -20,45 +30,64 @@
 .pagination a {
     font-size: 12px;
     font-weight: 500;
-    text-decoration: none;       /* Remove underline */
-    color: #000000;              /* Primary color for links */
-    border: 1px solid #dee2e6;   /* Light border */
-    padding: 8px 12px;          /* Add some padding */
-    border-radius: 4px;         /* Rounded corners */
-    transition: background-color 0.3s, color 0.3s; /* Smooth hover effects */
+    text-decoration: none;
+    /* Remove underline */
+    color: #000000;
+    /* Primary color for links */
+    border: 1px solid #dee2e6;
+    /* Light border */
+    padding: 8px 12px;
+    /* Add some padding */
+    border-radius: 4px;
+    /* Rounded corners */
+    transition: background-color 0.3s, color 0.3s;
+    /* Smooth hover effects */
 }
 
 .pagination a:hover {
-    background-color: #000000;   /* Background color on hover */
-    color: white;                /* White text on hover */
+    background-color: #000000;
+    /* Background color on hover */
+    color: white;
+    /* White text on hover */
 }
 
 .pagination .active span {
-    background-color: #000000;   /* Active page background */
-    color: white;                /* White text for active page */
-    border: 1px solid #000000;   /* Match border color */
-    padding: 8px 12px;          /* Match padding with links */
-    border-radius: 4px; 
-    font-size: 13px;  
-    font-weight: 500;      /* Rounded corners */
+    background-color: #000000;
+    /* Active page background */
+    color: white;
+    /* White text for active page */
+    border: 1px solid #000000;
+    /* Match border color */
+    padding: 8px 12px;
+    /* Match padding with links */
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    /* Rounded corners */
 }
 
 .pagination .disabled {
-    color: #6c757d;              /* Grey color for disabled items */
-    border: 1px solid #dee2e6;   /* Light border */
-    padding: 8px 12px;          /* Add some padding */
-    border-radius: 4px;         /* Rounded corners */
-    pointer-events: none;  
-    font-size: 13px;  
-    font-weight: 500;     /* Disable pointer events */
+    color: #6c757d;
+    /* Grey color for disabled items */
+    border: 1px solid #dee2e6;
+    /* Light border */
+    padding: 8px 12px;
+    /* Add some padding */
+    border-radius: 4px;
+    /* Rounded corners */
+    pointer-events: none;
+    font-size: 13px;
+    font-weight: 500;
+    /* Disable pointer events */
 }
 
 .pagination .disabled:hover {
-    background-color: transparent; /* No hover effect for disabled */
+    background-color: transparent;
+    /* No hover effect for disabled */
 }
 
 
-.refresh-btn{
+.refresh-btn {
     background-color: black;
     color: white;
     padding: 7px;
@@ -76,6 +105,7 @@
         opacity: 0;
         transform: translateY(20px);
     }
+
     100% {
         opacity: 1;
         transform: translateY(0);

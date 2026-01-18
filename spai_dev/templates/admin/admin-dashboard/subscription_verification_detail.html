@@ -1,0 +1,276 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Subscription Verification</title>
+    <link rel="stylesheet" href="{% static 'css/admin-dashboard/dashboard.css' %}" />
+    <style>
+      .page-wrap {
+        padding: 18px;
+      }
+      .card {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        box-shadow: var(--shadow-sm);
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+      .row {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+      .col {
+        flex: 1;
+        min-width: 280px;
+      }
+      .kv {
+        margin: 6px 0;
+        color: #333;
+      }
+      .kv strong {
+        color: #111;
+      }
+      .badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        border: 1px solid var(--border);
+        background: #f5f5f5;
+      }
+      .badge.pending {
+        background: #e3f2fd;
+        color: #0277bd;
+        border-color: #b3e5fc;
+      }
+      .badge.active {
+        background: #e8f5e9;
+        color: #2e7d32;
+        border-color: #c8e6c9;
+      }
+      .btn {
+        display: inline-block;
+        padding: 10px 14px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: #fff;
+        cursor: pointer;
+        text-decoration: none;
+        color: var(--dark);
+        font-weight: 600;
+      }
+      .btn-primary {
+        background: var(--primary);
+        color: #fff;
+        border: none;
+      }
+      .btn-danger {
+        background: #d32f2f;
+        color: #fff;
+        border: none;
+      }
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      .actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .payments {
+        padding-left: 18px;
+        margin: 0;
+      }
+      .payments li {
+        margin: 6px 0;
+      }
+      .alert {
+        padding: 10px 12px;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        border: 1px solid var(--border);
+        background: #fff;
+      }
+      .alert.success {
+        border-color: #c8e6c9;
+        background: #e8f5e9;
+        color: #2e7d32;
+      }
+      .alert.error {
+        border-color: #ffcdd2;
+        background: #ffe5e5;
+        color: #d32f2f;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="dashboard-container">
+      {% include 'admin/admin-dashboard/sidebar.html' %}
+
+      <div class="content">
+        <div class="page-wrap">
+          <div class="card">
+            <div class="actions" style="justify-content: space-between;">
+              <h2 style="margin: 0;">Subscription Verification</h2>
+              <a class="btn" href="{% url 'manage_dashboard' %}">Back to Dashboard</a>
+            </div>
+          </div>
+
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert {% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+
+          <div class="card">
+            <div class="row">
+              <div class="col">
+                <h3 style="margin-top:0;">User</h3>
+                <div class="kv">
+                  <strong>Name:</strong> {{ u.first_name }} {{ u.last_name }}
+                </div>
+                <div class="kv">
+                  <strong>Email:</strong> {{ u.email }}
+                </div>
+                <div class="kv">
+                  <strong>Username:</strong> {{ u.username }}
+                </div>
+                <div class="kv">
+                  <strong>State:</strong> {{ u.state|default:'-' }}
+                </div>
+                <div class="kv">
+                  <strong>Reg No:</strong> {{ u.reg_no|default:'-' }}
+                </div>
+                <div class="kv">
+                  <strong>Subscription Count:</strong> {{ u.subscription_count|default:0 }}
+                </div>
+                <div class="kv">
+                  <strong>Status:</strong>
+                  {% if u.subscription_status == 'Active' %}
+                    <span class="badge active">Active</span>
+                  {% elif u.subscription_status == 'Renewal Pending Approval' %}
+                    <span class="badge pending">Pending Approval</span>
+                  {% else %}
+                    <span class="badge">{{ u.subscription_status|default:'-' }}</span>
+                  {% endif %}
+                </div>
+
+                <div class="actions" style="margin-top: 12px;">
+                  <a class="btn" href="{% url 'individual_user_details' u.slug_value %}" target="_blank" rel="noopener">Open Full Profile</a>
+                  {% if latest_payment and latest_payment.document %}
+                    <a class="btn" href="{{ latest_payment.document.url }}" target="_blank" rel="noopener">Open Latest Proof</a>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="col">
+                <h3 style="margin-top:0;">Annual Subscription</h3>
+                {% if annual %}
+                  <div class="kv">
+                    <strong>Start:</strong> {{ annual.date_created|default:'-' }}
+                  </div>
+                  <div class="kv">
+                    <strong>End:</strong> {{ annual.end_date|default:'-' }}
+                  </div>
+                  <div class="kv">
+                    <strong>Active:</strong> {{ annual.active }}
+                  </div>
+                {% else %}
+                  <div class="kv">No annual subscription record found.</div>
+                {% endif %}
+
+                <h3 style="margin-top:16px;">Member Details</h3>
+                {% if user_detail %}
+                  <div class="kv">
+                    <strong>Degree:</strong> {{ user_detail.degree|default:'-' }}
+                  </div>
+                  <div class="kv">
+                    <strong>Profession:</strong> {{ user_detail.profession|default:'-' }}
+                  </div>
+                  <div class="kv">
+                    <strong>Institution:</strong> {{ user_detail.institution|default:'-' }}
+                  </div>
+                  <div class="kv">
+                    <strong>Department:</strong> {{ user_detail.department|default:'-' }}
+                  </div>
+                  <div class="kv">
+                    <strong>Phone:</strong> {{ user_detail.phone_number|default:'-' }}
+                  </div>
+                {% else %}
+                  <div class="kv">No extra profile details found.</div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="row" style="align-items: flex-start;">
+              <div class="col">
+                <h3 style="margin-top:0;">Payments</h3>
+                {% if payments %}
+                  <ul class="payments">
+                    {% for p in payments %}
+                      <li>
+                        <strong>ID:</strong> {{ p.payment_id|default:'-' }} |
+                        <strong>TXN:</strong> {{ p.transaction_id|default:'-' }} |
+                        <strong>Bank:</strong> {{ p.bank_name|default:'-' }} |
+                        <strong>Date:</strong> {{ p.payment_date|default:'-' }}
+                        {% if p.document %}
+                          | <a href="{{ p.document.url }}" target="_blank" rel="noopener">view proof</a>
+                        {% else %}
+                          | <span style="color:#777;">no proof</span>
+                        {% endif %}
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% else %}
+                  <div class="kv">No subscription payments found.</div>
+                {% endif %}
+              </div>
+
+              <div class="col">
+                <h3 style="margin-top:0;">Admin Action</h3>
+
+                {% if can_approve %}
+                  <form method="post" style="margin: 0;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Approve Subscription</button>
+                  </form>
+                {% else %}
+                  {% if u.subscription_status == 'Active' %}
+                    <div class="kv" style="color:#777;">
+                      User is already <strong>Active</strong>. No approval needed.
+                    </div>
+                  {% elif not annual or not annual.end_date %}
+                    <div class="kv" style="color:#777;">No previous annual subscription record found. Renewal approval is not applicable.</div>
+                  {% elif not latest_payment %}
+                    <div class="kv" style="color:#777;">No renewal payment found after expiry.</div>
+                  {% elif not latest_payment.document %}
+                    <div class="kv" style="color:#777;">Latest renewal payment has no proof document uploaded.</div>
+                  {% else %}
+                    <div class="kv" style="color:#777;">
+                      Renewal payment must be uploaded <strong>after</strong> the last subscription end date to approve.
+                    </div>
+                  {% endif %}
+                {% endif %}
+
+                <div class="kv" style="margin-top: 12px;">
+                  <a class="btn" href="{% url 'manage_dashboard' %}">Back</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

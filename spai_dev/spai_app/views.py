@@ -711,21 +711,15 @@ def admin_approval(request, *args, **kwargs):
             reg_no = get_registration_num()
             user.admin_approved = True
 
-            cutoff_date = datetime(2025, 4, 1, 0, 0, 0)
-            if datetime.now() < cutoff_date:
-                user.date_approved = cutoff_date
-            else:
-                user.date_approved = datetime.now()
+            cutoff_date = datetime(datetime.now().year, 4, 1, 0, 0, 0)
+            user.date_approved = cutoff_date if datetime.now() < cutoff_date else datetime.now()
             user.reg_no = reg_no
             user.active_key = True
 
             # Annual Subscription section
             current = datetime.today().date()
             cutoff_date_1 = cutoff_date.date()
-            if current < cutoff_date_1:
-                original_date = cutoff_date_1
-            else:
-                original_date = current
+            original_date = cutoff_date_1 if current < cutoff_date_1 else current
             annual_subscription = AnnualSubscriptionModel(
                 user=user,
                 date_created=original_date,
@@ -1028,7 +1022,7 @@ def create_or_update_life_member(request):
 
 
 def life_members_get(request):
-    life_members = LifeMembers.objects.all()
+    life_members = LifeMembers.objects.all().order_by('-id')
     all_members = User.objects.all()
     new_members = []
     active_members = []
@@ -1041,22 +1035,28 @@ def life_members_get(request):
         else:
             in_active_members.append(user_data)
 
-    # Add pagination for life_members
-    paginator = Paginator(life_members, 20)
-    page = request.GET.get('page')
+    def paginate(items, page_param, per_page=20, fallback_param=None):
+        paginator = Paginator(items, per_page)
+        page = request.GET.get(page_param)
+        if fallback_param and not page:
+            page = request.GET.get(fallback_param)
+        try:
+            return paginator.page(page)
+        except PageNotAnInteger:
+            return paginator.page(1)
+        except EmptyPage:
+            return paginator.page(paginator.num_pages)
 
-    try:
-        paginated_life_members = paginator.page(page)
-    except PageNotAnInteger:
-        paginated_life_members = paginator.page(1)
-    except EmptyPage:
-        paginated_life_members = paginator.page(paginator.num_pages)
+    paginated_life_members = paginate(life_members, 'page_life', fallback_param='page')
+    paginated_new_members = paginate(new_members, 'page_new')
+    paginated_active_members = paginate(active_members, 'page_active')
+    paginated_inactive_members = paginate(in_active_members, 'page_non_active')
 
     context = {
         'life_members': paginated_life_members,
-        'new_members': new_members,
-        'active': active_members,
-        'non_active': in_active_members,
+        'new_members': paginated_new_members,
+        'active': paginated_active_members,
+        'non_active': paginated_inactive_members,
     }
     return render(request, 'members/life_members.html', context)
 
@@ -1276,14 +1276,19 @@ def annual_sub_approval(request, *args, **kwargs):
     annual_model = models.AnnualSubscriptionModel.objects.filter(user=user).first()
     if annual_model is None:
         return redirect('individual_user_details', slug=slug)
+
+    latest_payment = SubscriptionPayment.objects.filter(user=user).order_by('-payment_date').first()
+    if not latest_payment:
+        messages.error(request, 'No annual subscription payment found for this user.')
+        return redirect('individual_user_details', slug=slug)
+    if not latest_payment.document:
+        messages.error(request, 'No payment proof uploaded for the latest annual subscription payment.')
+        return redirect('individual_user_details', slug=slug)
     # current = datetime.today()
     current = datetime.today().date()
-    cutoff_date = datetime(2025, 4, 1, 0, 0, 0)
+    cutoff_date = datetime(datetime.now().year, 4, 1, 0, 0, 0)
     cutoff_date_1 = cutoff_date.date()
-    if current < cutoff_date_1:
-        original_date = cutoff_date_1
-    else:
-        original_date = current
+    original_date = cutoff_date_1 if current < cutoff_date_1 else current
     annual_model.date_created = original_date
     annual_model.end_date = original_date + timedelta(days=365)
     annual_model.active = True
@@ -1421,11 +1426,8 @@ class BulkDataIngestionAPIView(APIView):
                     user.user_role = settings.MEMBER_ROLE_VALUE
                     user.admin_approved = True
                     if user.date_approved is None:
-                        cutoff_date = datetime(2025, 4, 1, 0, 0, 0)
-                        if datetime.now() < cutoff_date:
-                            user.date_approved = cutoff_date
-                        else:
-                            user.date_approved = datetime.now()
+                        cutoff_date = datetime(datetime.now().year, 4, 1, 0, 0, 0)
+                        user.date_approved = cutoff_date if datetime.now() < cutoff_date else datetime.now()
                     user.approval_percentage = 100
                     user.active_key = True
                     user.president_approval = True
@@ -1661,3 +1663,190 @@ def delete_leadership(request, pk):
 #     else:
 #         form = InternshipForm(instance=item)
 #     return render(request, 'edit_item.html', {'form': form, 'title': 'Edit Internship'})
+
+
+# --- Subscription Verification APIs ---
+@admin_only
+def subscription_verification_detail(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    user_detail = UserDetailModel.objects.filter(user=user).first()
+    annual = AnnualSubscriptionModel.objects.filter(user=user).order_by('-end_date', '-date_created').first()
+    payments = SubscriptionPayment.objects.filter(user=user).order_by('-payment_date')
+    latest_payment = payments.first()
+
+    last_end_date = annual.end_date if annual else None
+
+    can_approve = (
+        user.subscription_status != 'Active'
+        and last_end_date is not None
+        and latest_payment is not None
+        and bool(latest_payment.document)
+        and latest_payment.payment_date >= last_end_date
+    )
+
+    if request.method == 'POST':
+        if user.subscription_status == 'Active':
+            messages.error(request, 'User is already active; no renewal approval needed.')
+            return redirect('subscription_verification_detail', user_id=user.id)
+
+        if last_end_date is None:
+            messages.error(request, 'No previous annual subscription record found to renew.')
+            return redirect('subscription_verification_detail', user_id=user.id)
+
+        if latest_payment is None:
+            messages.error(request, 'No subscription payment found for user.')
+            return redirect('subscription_verification_detail', user_id=user.id)
+
+        if not latest_payment.document:
+            messages.error(request, 'Latest subscription payment has no proof document uploaded.')
+            return redirect('subscription_verification_detail', user_id=user.id)
+
+        if latest_payment.payment_date < last_end_date:
+            messages.error(request, 'Latest payment is older than the last subscription end date.')
+            return redirect('subscription_verification_detail', user_id=user.id)
+
+        annual_model = AnnualSubscriptionModel.objects.filter(user=user).order_by('-end_date', '-date_created').first()
+        if annual_model is None:
+            messages.error(request, 'No previous annual subscription record found to renew.')
+            return redirect('subscription_verification_detail', user_id=user.id)
+
+        current = datetime.today().date()
+        cutoff_date = datetime(datetime.now().year, 4, 1, 0, 0, 0)
+        cutoff_date_1 = cutoff_date.date()
+        original_date = cutoff_date_1 if current < cutoff_date_1 else current
+
+        annual_model.date_created = original_date
+        annual_model.end_date = original_date + timedelta(days=365)
+        annual_model.active = True
+
+        user.annual_subscription = True
+        user.subscription_status = 'Active'
+        user.subscription_count = (user.subscription_count or 0) + 1
+
+        annual_model.save()
+        user.save()
+
+        messages.success(request, 'Subscription approved successfully.')
+        return redirect('subscription_verification_detail', user_id=user.id)
+
+    context = {
+        'u': user,
+        'user_detail': user_detail,
+        'annual': annual,
+        'payments': payments,
+        'latest_payment': latest_payment,
+        'can_approve': can_approve,
+    }
+    return render(request, 'admin/admin-dashboard/subscription_verification_detail.html', context)
+
+
+@admin_only
+def api_subscription_user_details(request, user_id):
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+    user = get_object_or_404(User, id=user_id)
+    user_detail = UserDetailModel.objects.filter(user=user).first()
+    annual = AnnualSubscriptionModel.objects.filter(user=user).order_by('-end_date').first()
+    payments = SubscriptionPayment.objects.filter(user=user).order_by('-payment_date')
+
+    data = {
+        'user': {
+            'id': user.id,
+            'slug': user.slug_value,
+            'name': f"{user.first_name or ''} {user.last_name or ''}".strip() or f"User_{user.id}",
+            'email': user.email,
+            'username': user.username,
+            'state': user.state,
+            'reg_no': user.reg_no,
+            'subscription_status': user.subscription_status,
+            'subscription_count': user.subscription_count or 0,
+            'admin_approved': bool(user.admin_approved),
+            'president_approval': bool(user.president_approval),
+            'secretary_approval': bool(user.secretary_approval),
+        },
+        'profile': ({
+            'degree': user_detail.degree,
+            'profession': user_detail.profession,
+            'institution': user_detail.institution,
+            'department': user_detail.department,
+            'address': user_detail.address,
+            'phone_number': user_detail.phone_number,
+            'alternate_number': user_detail.alternate_number,
+            'alternate_mail': user_detail.alternate_mail,
+            'photo_url': (user_detail.photo.url if user_detail and user_detail.photo else None),
+        } if user_detail else None),
+        'annual': ({
+            'date_created': annual.date_created,
+            'end_date': annual.end_date,
+            'active': bool(annual.active),
+        } if annual else None),
+        'payments': [
+            {
+                'payment_id': p.payment_id,
+                'transaction_id': p.transaction_id,
+                'bank_name': p.bank_name,
+                'payment_date': p.payment_date,
+                'document_url': (p.document.url if p.document else None),
+            }
+            for p in payments
+        ]
+    }
+
+    return JsonResponse({'success': True, 'data': data})
+
+
+@admin_only
+def api_subscription_user_approve(request, user_id):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+    user = get_object_or_404(User, id=user_id)
+
+    if user.subscription_status == 'Active':
+        return JsonResponse({'success': False, 'message': 'User is already active; no renewal approval needed'}, status=400)
+
+    latest_payment = SubscriptionPayment.objects.filter(user=user).order_by('-payment_date').first()
+    if not latest_payment:
+        return JsonResponse({'success': False, 'message': 'No subscription payment found for user'}, status=400)
+    if not latest_payment.document:
+        return JsonResponse({'success': False, 'message': 'Latest subscription payment has no proof document uploaded'}, status=400)
+
+    annual_latest = AnnualSubscriptionModel.objects.filter(user=user).order_by('-end_date', '-date_created').first()
+    if not annual_latest or not annual_latest.end_date:
+        return JsonResponse({'success': False, 'message': 'No previous annual subscription record found to renew'}, status=400)
+    if latest_payment.payment_date < annual_latest.end_date:
+        return JsonResponse({'success': False, 'message': 'Latest payment is older than the last subscription end date'}, status=400)
+
+    annual_model = annual_latest
+
+    current = datetime.today().date()
+    cutoff_date = datetime(datetime.now().year, 4, 1, 0, 0, 0)
+    cutoff_date_1 = cutoff_date.date()
+    original_date = cutoff_date_1 if current < cutoff_date_1 else current
+
+    annual_model.date_created = original_date
+    annual_model.end_date = original_date + timedelta(days=365)
+    annual_model.active = True
+
+    user.annual_subscription = True
+    user.subscription_status = 'Active'
+    user.subscription_count = (user.subscription_count or 0) + 1
+
+    annual_model.save()
+    user.save()
+
+    return JsonResponse({
+        'success': True,
+        'message': 'Subscription approved successfully',
+        'user': {
+            'id': user.id,
+            'subscription_status': user.subscription_status,
+            'subscription_count': user.subscription_count,
+        },
+        'annual': {
+            'date_created': annual_model.date_created,
+            'end_date': annual_model.end_date,
+            'active': annual_model.active,
+        }
+    })
