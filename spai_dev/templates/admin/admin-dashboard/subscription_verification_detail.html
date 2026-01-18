@@ -240,22 +240,31 @@
               <div class="col">
                 <h3 style="margin-top:0;">Admin Action</h3>
 
-                {% if can_approve %}
+                {% if can_approve_renewal %}
                   <form method="post" style="margin: 0;">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-primary">Approve Subscription</button>
+                    <input type="hidden" name="action" value="renewal" />
+                    <button type="submit" class="btn btn-primary">Approve Renewal</button>
+                  </form>
+                {% elif can_approve_new_admission %}
+                  <form method="post" style="margin: 0;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="new_admission" />
+                    <button type="submit" class="btn btn-primary">Approve New Admission</button>
                   </form>
                 {% else %}
                   {% if u.subscription_status == 'Active' %}
                     <div class="kv" style="color:#777;">
                       User is already <strong>Active</strong>. No approval needed.
                     </div>
-                  {% elif not annual or not annual.end_date %}
-                    <div class="kv" style="color:#777;">No previous annual subscription record found. Renewal approval is not applicable.</div>
                   {% elif not latest_payment %}
                     <div class="kv" style="color:#777;">No renewal payment found after expiry.</div>
                   {% elif not latest_payment.document %}
                     <div class="kv" style="color:#777;">Latest renewal payment has no proof document uploaded.</div>
+                  {% elif not annual or not annual.end_date %}
+                    <div class="kv" style="color:#777;">
+                      No previous annual subscription record found. You can only approve as <strong>New Admission</strong> after a payment proof is uploaded.
+                    </div>
                   {% else %}
                     <div class="kv" style="color:#777;">
                       Renewal payment must be uploaded <strong>after</strong> the last subscription end date to approve.

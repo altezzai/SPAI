@@ -1676,7 +1676,7 @@ def subscription_verification_detail(request, user_id):
 
     last_end_date = annual.end_date if annual else None
 
-    can_approve = (
+    can_approve_renewal = (
         user.subscription_status != 'Active'
         and last_end_date is not None
         and latest_payment is not None
@@ -1684,13 +1684,18 @@ def subscription_verification_detail(request, user_id):
         and latest_payment.payment_date >= last_end_date
     )
 
+    can_approve_new_admission = (
+        user.subscription_status != 'Active'
+        and last_end_date is None
+        and latest_payment is not None
+        and bool(latest_payment.document)
+    )
+
     if request.method == 'POST':
+        action = request.POST.get('action')
+
         if user.subscription_status == 'Active':
             messages.error(request, 'User is already active; no renewal approval needed.')
-            return redirect('subscription_verification_detail', user_id=user.id)
-
-        if last_end_date is None:
-            messages.error(request, 'No previous annual subscription record found to renew.')
             return redirect('subscription_verification_detail', user_id=user.id)
 
         if latest_payment is None:
@@ -1701,13 +1706,31 @@ def subscription_verification_detail(request, user_id):
             messages.error(request, 'Latest subscription payment has no proof document uploaded.')
             return redirect('subscription_verification_detail', user_id=user.id)
 
-        if latest_payment.payment_date < last_end_date:
-            messages.error(request, 'Latest payment is older than the last subscription end date.')
-            return redirect('subscription_verification_detail', user_id=user.id)
+        if action == 'renewal':
+            if last_end_date is None:
+                messages.error(request, 'No previous annual subscription record found to renew.')
+                return redirect('subscription_verification_detail', user_id=user.id)
 
-        annual_model = AnnualSubscriptionModel.objects.filter(user=user).order_by('-end_date', '-date_created').first()
-        if annual_model is None:
-            messages.error(request, 'No previous annual subscription record found to renew.')
+            if latest_payment.payment_date < last_end_date:
+                messages.error(request, 'Latest payment is older than the last subscription end date.')
+                return redirect('subscription_verification_detail', user_id=user.id)
+
+            annual_model = AnnualSubscriptionModel.objects.filter(user=user).order_by('-end_date', '-date_created').first()
+            if annual_model is None:
+                messages.error(request, 'No previous annual subscription record found to renew.')
+                return redirect('subscription_verification_detail', user_id=user.id)
+
+            approval_success_message = 'Renewal approved successfully.'
+
+        elif action == 'new_admission':
+            annual_model = AnnualSubscriptionModel.objects.filter(user=user).order_by('-end_date', '-date_created').first()
+            if annual_model is None:
+                annual_model = AnnualSubscriptionModel(user=user)
+
+            approval_success_message = 'New admission subscription approved successfully.'
+
+        else:
+            messages.error(request, 'Invalid approval action.')
             return redirect('subscription_verification_detail', user_id=user.id)
 
         current = datetime.today().date()
@@ -1726,7 +1749,7 @@ def subscription_verification_detail(request, user_id):
         annual_model.save()
         user.save()
 
-        messages.success(request, 'Subscription approved successfully.')
+        messages.success(request, approval_success_message)
         return redirect('subscription_verification_detail', user_id=user.id)
 
     context = {
@@ -1735,7 +1758,8 @@ def subscription_verification_detail(request, user_id):
         'annual': annual,
         'payments': payments,
         'latest_payment': latest_payment,
-        'can_approve': can_approve,
+        'can_approve_renewal': can_approve_renewal,
+        'can_approve_new_admission': can_approve_new_admission,
     }
     return render(request, 'admin/admin-dashboard/subscription_verification_detail.html', context)
 
